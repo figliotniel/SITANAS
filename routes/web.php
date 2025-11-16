@@ -3,13 +3,12 @@
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Auth\LoginPage;
 use App\Livewire\Dashboard\DashboardPage;
-use App\Livewire\Aset\FormAset; // <-- Ini komponen pintar kita
+use App\Livewire\Aset\FormAset;
 use App\Livewire\Aset\DetailPage;
 use App\Livewire\Admin\ManajemenUser;
 use App\Livewire\Laporan\LaporanPage;
 use App\Livewire\Admin\ArsipAset;
 use App\Livewire\Public\HalamanPublik;
-// use App\Livewire\Aset\EditAset; // <-- Pastikan ini sudah dihapus/dikomentari
 
 Route::get('/publik', HalamanPublik::class)->name('publik');
 
@@ -27,7 +26,6 @@ Route::middleware('auth')->group(function () {
     // Rute Aset
     Route::get('/tanah/tambah', FormAset::class)->name('aset.tambah');
     
-    // --- INI RUTE YANG HILANG ---
     // Tambahkan baris ini kembali, arahkan ke FormAset::class
     Route::get('/tanah/{aset}/edit', FormAset::class)->withTrashed()->name('aset.edit');
     // ----------------------------
@@ -40,5 +38,4 @@ Route::middleware('auth')->group(function () {
     // Rute Admin
     Route::get('/admin/users', ManajemenUser::class)->name('admin.users');
     Route::get('/admin/arsip', ArsipAset::class)->name('admin.arsip');
-    
 });
