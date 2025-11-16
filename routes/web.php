@@ -24,7 +24,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/', DashboardPage::class)->name('dashboard');
 
     // Rute Aset
-    Route::get('/tanah/tambah', FormAset::class)->name('aset.tambah');
+    Route::get('/tanah/tambah', FormAset::class)->name('aset.form');
 
     Route::get('/tanah/{aset}', DetailPage::class)->name('aset.detail');
 

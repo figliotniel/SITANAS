@@ -3,7 +3,7 @@
         <h1>Dashboard Aset Tanah</h1>
         <div>
             @if(auth()->user()->role_id == 1)
-            <a href="{{ route('aset.tambah') }}" wire:navigate class="btn btn-primary">Tambah Data Tanah</a>
+            <a href="{{ route('aset.form') }}" wire:navigate class="btn btn-primary">Tambah Data Tanah</a>
             @endif
         </div>
     </div>
