@@ -16,8 +16,8 @@ class UserSeeder extends Seeder
         DB::table('users')->insert([
             'nama_lengkap' => 'Admin Utama',
             'email' => 'admin@sitanas.com',
-            'password' => Hash::make('password'), // Password defaultnya "password"
-            'role_id' => 1, // ID 1 = Admin Desa
+            'password' => Hash::make('password'),
+            'role_id' => 1,
             'status' => 'aktif',
             'created_at' => now(),
             'updated_at' => now(),

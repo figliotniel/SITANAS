@@ -25,10 +25,6 @@ Route::middleware('auth')->group(function () {
 
     // Rute Aset
     Route::get('/tanah/tambah', FormAset::class)->name('aset.tambah');
-    
-    // Tambahkan baris ini kembali, arahkan ke FormAset::class
-    Route::get('/tanah/{aset}/edit', FormAset::class)->withTrashed()->name('aset.edit');
-    // ----------------------------
 
     Route::get('/tanah/{aset}', DetailPage::class)->name('aset.detail');
 
