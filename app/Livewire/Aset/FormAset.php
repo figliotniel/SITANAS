@@ -15,10 +15,8 @@ use Illuminate\Support\Facades\Storage;
 #[Layout('layouts.app')]
 class FormAset extends Component
 {
-    public ?TanahKasDesa $aset = null; // Penampung model jika mode edit
-    public $isEditMode = false;      // Penanda mode
-
-    // Daftar properti form (tetap sama)
+    public ?TanahKasDesa $aset = null;
+    public $isEditMode = false;
     public $kode_barang = '';
     public $nup = '';
     public $asal_perolehan = '';
@@ -39,7 +37,6 @@ class FormAset extends Component
     public $batas_barat = '';
     public $keterangan = '';
 
-    // Aturan validasi (tetap sama)
     protected $rules = [
         'kode_barang' => 'nullable|string|max:255',
         'nup' => 'nullable|string|max:255',
@@ -62,10 +59,9 @@ class FormAset extends Component
         'keterangan' => 'nullable|string',
     ];
 
-    public function mount(TanahKasDesa $aset = null)
+    public function mount(?TanahKasDesa $aset = null)
     {
         if ($aset) {
-            // --- INI MODE EDIT ---
             $this->aset = $aset;
             $this->isEditMode = true;
             $this->kode_barang = $aset->kode_barang;
@@ -88,19 +84,13 @@ class FormAset extends Component
             $this->batas_barat = $aset->batas_barat;
             $this->keterangan = $aset->keterangan;
         }
-        // --- JIKA INI MODE TAMBAH ($aset null) ---
-        // Tidak perlu 'else', properti sudah di-set ke string kosong ('') di atas.
-    }
+       }
 
-    // --- 3. FUNGSI SAVE YANG DIMODIFIKASI ---
-    /**
-     * Menyimpan data (bisa create atau update).
-     */
+
     public function save()
     {
-        $this->validate(); // Validasi dijalankan (aturan tetap sama)
+        $this->validate();
 
-        // Kumpulkan data yang divalidasi
         $data = [
             'kode_barang' => $this->kode_barang,
             'nup' => $this->nup,
@@ -124,14 +114,12 @@ class FormAset extends Component
         ];
 
         if ($this->isEditMode) {
-            // --- LOGIC UPDATE (dari EditAset::update()) ---
-            $data['status_validasi'] = 'Diproses'; // Reset status saat edit
+            $data['status_validasi'] = 'Diproses';
             $this->aset->update($data);
             
             session()->flash('success', 'Data aset berhasil diperbarui.');
 
         } else {
-            // --- LOGIC CREATE (dari FormAset::save() lama) ---
             $data['diinput_oleh'] = Auth::id();
             $data['status_validasi'] = 'Diproses';
             TanahKasDesa::create($data);
@@ -139,7 +127,6 @@ class FormAset extends Component
             session()->flash('success', 'Data aset baru berhasil ditambahkan.');
         }
 
-        // Redirect tetap sama
         return $this->redirectRoute('dashboard', navigate: true);
     }
 
