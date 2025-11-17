@@ -11,10 +11,12 @@ use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 #[Layout('layouts.app')]
 class FormAset extends Component
 {
+    // Properti utama untuk form (Sesuai dengan kolom database)
     public ?TanahKasDesa $aset = null;
     public $isEditMode = false;
     public $kode_barang = '';
@@ -35,9 +37,9 @@ class FormAset extends Component
     public $batas_timur = '';
     public $batas_selatan = '';
     public $batas_barat = '';
-    public $keterangan = '';
+    public $keterangan = ''; // ✅ PASTIKAN ADA TITIK KOMA DI SINI
 
-    protected $rules = [
+    protected $rules = [ // <-- Kode PHP akan dimuat dengan benar setelah titik koma
         'kode_barang' => 'nullable|string|max:255',
         'nup' => 'nullable|string|max:255',
         'asal_perolehan' => 'required|string|max:255',
@@ -61,7 +63,7 @@ class FormAset extends Component
 
     public function mount(?TanahKasDesa $aset = null)
     {
-        if ($aset) {
+        if ($aset && $aset->exists) {
             $this->aset = $aset;
             $this->isEditMode = true;
             $this->kode_barang = $aset->kode_barang;
@@ -84,50 +86,68 @@ class FormAset extends Component
             $this->batas_barat = $aset->batas_barat;
             $this->keterangan = $aset->keterangan;
         }
-       }
+    }
 
 
+    /**
+     * Method SAVE untuk menyimpan atau memperbarui data aset.
+     */
     public function save()
     {
-        $this->validate();
+        try {
+            // Lakukan validasi data form
+            $this->validate();
 
-        $data = [
-            'kode_barang' => $this->kode_barang,
-            'nup' => $this->nup,
-            'asal_perolehan' => $this->asal_perolehan,
-            'tanggal_perolehan' => $this->tanggal_perolehan,
-            'harga_perolehan' => $this->harga_perolehan ?: 0,
-            'bukti_perolehan' => $this->bukti_perolehan,
-            'nomor_sertifikat' => $this->nomor_sertifikat,
-            'tanggal_sertifikat' => $this->tanggal_sertifikat,
-            'status_sertifikat' => $this->status_sertifikat,
-            'luas' => $this->luas,
-            'lokasi' => $this->lokasi,
-            'penggunaan' => $this->penggunaan,
-            'koordinat' => $this->koordinat,
-            'kondisi' => $this->kondisi,
-            'batas_utara' => $this->batas_utara,
-            'batas_timur' => $this->batas_timur,
-            'batas_selatan' => $this->batas_selatan,
-            'batas_barat' => $this->batas_barat,
-            'keterangan' => $this->keterangan,
-        ];
+            $data = [
+                'kode_barang' => $this->kode_barang,
+                'nup' => $this->nup,
+                'asal_perolehan' => $this->asal_perolehan,
+                'tanggal_perolehan' => $this->tanggal_perolehan,
+                'harga_perolehan' => $this->harga_perolehan ?: 0,
+                'bukti_perolehan' => $this->bukti_perolehan,
+                'nomor_sertifikat' => $this->nomor_sertifikat,
+                'tanggal_sertifikat' => $this->tanggal_sertifikat,
+                'status_sertifikat' => $this->status_sertifikat,
+                'luas' => $this->luas,
+                'lokasi' => $this->lokasi,
+                'penggunaan' => $this->penggunaan,
+                'koordinat' => $this->koordinat,
+                'kondisi' => $this->kondisi,
+                'batas_utara' => $this->batas_utara,
+                'batas_timur' => $this->batas_timur,
+                'batas_selatan' => $this->batas_selatan,
+                'batas_barat' => $this->batas_barat,
+                'keterangan' => $this->keterangan,
+            ];
 
-        if ($this->isEditMode) {
-            $data['status_validasi'] = 'Diproses';
-            $this->aset->update($data);
+            $message = '';
+            if ($this->isEditMode) {
+                $data['status_validasi'] = 'Diproses';
+                $this->aset->update($data);
+                $message = 'Data aset berhasil diperbarui dan menunggu validasi ulang.';
+                Log::info('Aset berhasil diperbarui', ['aset_id' => $this->aset->id, 'user_id' => Auth::id()]);
+
+            } else {
+                $data['diinput_oleh'] = Auth::id();
+                $data['status_validasi'] = 'Diproses';
+                $newAset = TanahKasDesa::create($data);
+                $message = 'Data aset baru berhasil ditambahkan dan menunggu validasi.';
+                Log::info('Aset baru berhasil dibuat', ['aset_id' => $newAset->id, 'user_id' => Auth::id()]);
+            }
+
+            session()->flash('success', $message);
+            // Redirect ke dashboard setelah berhasil.
+            return $this->redirectRoute('dashboard'); 
             
-            session()->flash('success', 'Data aset berhasil diperbarui.');
-
-        } else {
-            $data['diinput_oleh'] = Auth::id();
-            $data['status_validasi'] = 'Diproses';
-            TanahKasDesa::create($data);
-            
-            session()->flash('success', 'Data aset baru berhasil ditambahkan.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+             // Jika validasi gagal, kembalikan error ke form (Livewire menangani ini otomatis)
+            throw $e;
+        } catch (\Exception $e) {
+            // Tangkap error lain (misalnya DB error)
+            Log::error('Kesalahan fatal saat menyimpan aset: ' . $e->getMessage(), ['user_id' => Auth::id()]);
+            session()->flash('error', 'Terjadi kesalahan sistem saat menyimpan data.');
+            return $this->redirectRoute('dashboard');
         }
-
-        return $this->redirectRoute('dashboard', navigate: true);
     }
 
     public function render()

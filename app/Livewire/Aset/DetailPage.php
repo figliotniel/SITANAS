@@ -9,19 +9,15 @@ use App\Models\DokumenPendukung;
 use App\Models\PemanfaatanTanah;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Auth;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 #[Layout('layouts.app')]
 class DetailPage extends Component
 {
     use WithFileUploads;
     public TanahKasDesa $aset;
-
-    // [BARU] Properti untuk menampung daftar dokumen
     public $dokumen_pendukung = [];
-    
-    // Properti untuk form pemanfaatan (ini sudah ada di file Anda)
     public $p_bentuk_pemanfaatan = 'Sewa';
     public $p_pihak_ketiga;
     public $p_tanggal_mulai;
@@ -30,8 +26,6 @@ class DetailPage extends Component
     public $p_status_pembayaran = 'Belum Lunas';
     public $p_path_bukti;
     public $p_keterangan;
-
-    // Properti membingungkan dari file Anda (kita abaikan dulu)
     public $fileUpload;
     public $nama_dokumen;
     public $kategori_dokumen = 'Lain-lain';
@@ -46,10 +40,15 @@ class DetailPage extends Component
         $this->loadDokumenPendukung();
     }
 
-    /**
-     * [BARU] Fungsi untuk memuat dokumen
-     * Ini akan dicek berdasarkan role
-     */
+    public function downloadDetailPdf()
+    {
+        $pdf = Pdf::loadView('pdf.detail_aset', ['aset' => $this->aset]);
+        
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->stream();
+        }, 'detail-aset-'.$this->aset->kode_barang.'.pdf');
+    }
+
     public function loadDokumenPendukung()
     {
         $user = Auth::user();
@@ -108,34 +107,10 @@ class DetailPage extends Component
         session()->flash('success_pemanfaatan', 'Riwayat pemanfaatan berhasil ditambahkan.');
     }
 
-    /**
-     * Fungsi untuk download PDF detail
-     * (Ini sudah ada di file Anda, tidak diubah)
-     */
-    public function downloadDetailPdf()
-    {
-        $data = ['aset' => $this->aset];
-        $pdf = Pdf::loadView('pdf.detail_aset', $data)
-                  ->setPaper('a4', 'portrait');
-
-        return response()->streamDownload(function () use ($pdf) {
-            echo $pdf->stream();
-        }, 'detail-aset-'.$this->aset->kode_barang.'.pdf');
-    }
-
-    /**
-     * Fungsi render
-     * (Tidak diubah)
-     */
     public function render()
     {
         return view('livewire.aset.detail-page');
     }
-
-    /**
-     * Fungsi simpanDokumen Bawaan Anda
-     * (Saya biarkan saja, tapi ini seharusnya tidak ada di DetailPage)
-     */
     public function simpanDokumen()
     {
         // Validasi
