@@ -27,7 +27,7 @@ Route::middleware('auth')->group(function () {
     // Rute ASET (STRUKTUR YANG BENAR & AMAN)
     
     // 1. TAMBAH (STATIS: /tanah/tambah). Harus di atas semua rute dinamis /tanah/{aset}.
-    Route::get('/tanah/tambah', FormAset::class)->name('aset.tambah');
+    Route::get('/tanah/baru', FormAset::class)->name('aset.tambah');
 
     // 2. EDIT (DINAMIS: /tanah/{ID}/edit)
     Route::get('/tanah/{aset}/edit', FormAset::class)->withTrashed()->name('aset.edit');

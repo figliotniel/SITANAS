@@ -1,11 +1,7 @@
 <div>
     <div class="content-header">
         <h1>
-            @if($isEditMode)
-                Edit Data Tanah
-            @else
-                Tambah Data Tanah Baru
-            @endif
+            {{ $this->pageTitle }} {{-- Menggunakan properti $pageTitle dari FormAset.php --}}
         </h1>
         <a href="{{ route('dashboard') }}" wire:navigate class="btn btn-secondary">Kembali</a>
     </div>
@@ -70,11 +66,7 @@
                 </div>
 
                 <button type="submit" class="btn btn-primary" style="margin-top: 1.5rem;">
-                    @if($isEditMode)
-                        Simpan Perubahan
-                    @else
-                        Simpan Data
-                    @endif
+                    {{ $this->saveButtonText }} {{-- Menggunakan Computed Property dari FormAset.php --}}
                 </button>
             </form>
             <div class="form-group" style="grid-column: 1 / -1; margin-top: 1rem;">

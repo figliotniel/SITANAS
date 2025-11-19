@@ -4,20 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes; // 1. IMPORT FITUR ARSIP
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TanahKasDesa extends Model
 {
-    use HasFactory, SoftDeletes; // 2. AKTIFKAN FITUR ARSIP
-
-    /**
-     * Nama tabel yang terhubung ke model ini.
-     */
-    protected $table = 'tanah_kas_desa'; // 3. BERI TAHU NAMA TABELNYA
-
-    /**
-     * Kolom yang boleh diisi secara massal (untuk form tambah/edit).
-     */
+    use HasFactory, SoftDeletes;
+    protected $table = 'tanah_kas_desa'; 
     protected $fillable = [
         'kode_barang', 'nup', 'asal_perolehan', 'tanggal_perolehan', 
         'harga_perolehan', 'bukti_perolehan', 'nomor_sertifikat', 

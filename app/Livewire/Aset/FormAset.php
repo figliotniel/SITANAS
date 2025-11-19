@@ -5,18 +5,18 @@ namespace App\Livewire\Aset;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 use App\Models\TanahKasDesa;
+use Illuminate\Support\Facades\Log;
 use App\Models\DokumenPendukung;
 use App\Models\PemanfaatanTanah;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Auth;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
+use Barryvdh\DomPDF\Facade\Pdf;
+
 
 #[Layout('layouts.app')]
 class FormAset extends Component
 {
-    // Properti utama untuk form (Sesuai dengan kolom database)
     public ?TanahKasDesa $aset = null;
     public $isEditMode = false;
     public $kode_barang = '';
@@ -32,14 +32,14 @@ class FormAset extends Component
     public $lokasi = '';
     public $penggunaan = '';
     public $koordinat = '';
-    public $kondisi = 'Baik';
+    public $kondisi = '';
     public $batas_utara = '';
     public $batas_timur = '';
     public $batas_selatan = '';
     public $batas_barat = '';
-    public $keterangan = ''; // ✅ PASTIKAN ADA TITIK KOMA DI SINI
+    public $keterangan = '';
 
-    protected $rules = [ // <-- Kode PHP akan dimuat dengan benar setelah titik koma
+    protected $rules = [
         'kode_barang' => 'nullable|string|max:255',
         'nup' => 'nullable|string|max:255',
         'asal_perolehan' => 'required|string|max:255',
@@ -88,14 +88,9 @@ class FormAset extends Component
         }
     }
 
-
-    /**
-     * Method SAVE untuk menyimpan atau memperbarui data aset.
-     */
     public function save()
     {
         try {
-            // Lakukan validasi data form
             $this->validate();
 
             $data = [
@@ -103,7 +98,7 @@ class FormAset extends Component
                 'nup' => $this->nup,
                 'asal_perolehan' => $this->asal_perolehan,
                 'tanggal_perolehan' => $this->tanggal_perolehan,
-                'harga_perolehan' => $this->harga_perolehan ?: 0,
+                'harga_perolehan' => $this->harga_perolehan,
                 'bukti_perolehan' => $this->bukti_perolehan,
                 'nomor_sertifikat' => $this->nomor_sertifikat,
                 'tanggal_sertifikat' => $this->tanggal_sertifikat,
@@ -136,14 +131,11 @@ class FormAset extends Component
             }
 
             session()->flash('success', $message);
-            // Redirect ke dashboard setelah berhasil.
             return $this->redirectRoute('dashboard'); 
             
         } catch (\Illuminate\Validation\ValidationException $e) {
-             // Jika validasi gagal, kembalikan error ke form (Livewire menangani ini otomatis)
             throw $e;
         } catch (\Exception $e) {
-            // Tangkap error lain (misalnya DB error)
             Log::error('Kesalahan fatal saat menyimpan aset: ' . $e->getMessage(), ['user_id' => Auth::id()]);
             session()->flash('error', 'Terjadi kesalahan sistem saat menyimpan data.');
             return $this->redirectRoute('dashboard');

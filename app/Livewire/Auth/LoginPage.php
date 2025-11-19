@@ -12,7 +12,6 @@ class LoginPage extends Component
     public $email = '';
     public $password = '';
 
-    // Fungsi ini akan dipanggil oleh <form wire:submit="login">
     public function login()
     {
         // 1. Validasi input
@@ -21,10 +20,8 @@ class LoginPage extends Component
             'password' => 'required',
         ]);
 
-        // 2. Tambahkan pengecekan STATUS AKTIF (sesuai rencana kita)
         $credentials['status'] = 'aktif';
 
-        // 3. Coba login
         if (Auth::attempt($credentials)) {
             
             // 4. Regenerate session (keamanan)
@@ -35,14 +32,11 @@ class LoginPage extends Component
         
         }
 
-        // 6. Jika login gagal
         session()->flash('error', 'Kombinasi Email atau Password salah, atau akun Anda tidak aktif.');
     }
 
-    // Fungsi ini yang menampilkan HTML-nya
     public function render()
     {
-        // 3. Hapus ->layout(...) dari sini
         return view('livewire.auth.login-page');
     }
 }

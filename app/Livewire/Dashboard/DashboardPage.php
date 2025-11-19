@@ -14,8 +14,6 @@ class DashboardPage extends Component
 
     public $searchTerm = '';
     public $filterStatus = '';
-
-    // 1. PROPERTI BARU UNTUK MODAL VALIDASI
     public $showValidasiModal = false;
     public $validasiAsetId;
     public $validasiStatus;
@@ -33,9 +31,6 @@ class DashboardPage extends Component
             session()->flash('success', 'Data aset berhasil diarsipkan.');
         }
     }
-
-    // 2. FUNGSI BARU: UNTUK MEMBUKA MODAL
-    // (Mirip logika di index.php lama)
     public function openValidasiModal($id, $status)
     {
         $this->validasiAsetId = $id;
@@ -44,17 +39,13 @@ class DashboardPage extends Component
         $this->showValidasiModal = true;
     }
 
-    // 3. FUNGSI BARU: UNTUK MENUTUP MODAL
     public function closeValidasiModal()
     {
         $this->showValidasiModal = false;
     }
 
-    // 4. FUNGSI BARU: UNTUK MEMPROSES VALIDASI
-    // (Pengganti proses_crud.php?aksi=validasi)
     public function prosesValidasi()
     {
-        // Pastikan user adalah Kades
         if (auth()->user()->role_id != 2) {
             return;
         }
@@ -64,7 +55,7 @@ class DashboardPage extends Component
             $aset->update([
                 'status_validasi' => $this->validasiStatus,
                 'catatan_validasi' => $this->validasiCatatan,
-                'divalidasi_oleh' => auth()->id(),
+                'divalidasi_oleh' => auth()->user(),
             ]);
 
             session()->flash('success', 'Aset berhasil divalidasi.');

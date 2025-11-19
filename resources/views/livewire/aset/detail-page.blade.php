@@ -1,7 +1,9 @@
 <div>
     <div class="content-header">
         <h1>Dashboard</h1>
-        <a href="{{ route('aset.tambah') }}" wire:navigate class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Data Tanah</a>
+        @if(auth()->user()->role_id == 1)
+            <a href="{{ route('aset.tambah') }}" wire:navigate class="btn btn-primary" title="Tambah Data Tanah"><i class="fas fa-plus"></i> Tambah Data Tanah</a>
+        @endif
     </div>
 
     <div class="stat-container">
