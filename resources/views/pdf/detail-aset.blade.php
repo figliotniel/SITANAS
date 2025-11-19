@@ -3,7 +3,6 @@
 <head>
     <title>Detail Aset - {{ $aset->kode_barang }}</title>
     <style>
-        /* Gaya dasar untuk PDF */
         body { font-family: sans-serif; font-size: 10pt; }
         .header { text-align: center; margin-bottom: 20px; }
         .header h1 { margin: 0; font-size: 16pt; }

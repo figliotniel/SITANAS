@@ -8,22 +8,18 @@ use App\Models\User;
 use App\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
-use Livewire\Attributes\On; // 1. IMPORT FITUR EVENT LISTENER
+use Livewire\Attributes\On;
 
 #[Layout('layouts.app')]
 class ManajemenUser extends Component
 {
     public $users;
     public $roles;
-
-    // Properti form 'Buat Akun Baru'
     public $nama_lengkap;
     public $email;
     public $role_id;
     public $password;
     public $password_confirmation;
-
-    // 2. PROPERTI BARU UNTUK MODAL
     public $showEditModal = false;
     public $editingUserId;
 
@@ -73,21 +69,18 @@ class ManajemenUser extends Component
         }
     }
 
-    // 3. FUNGSI BARU UNTUK MEMBUKA MODAL
     public function openEditModal($userId)
     {
         $this->editingUserId = $userId;
         $this->showEditModal = true;
     }
 
-    // 4. FUNGSI BARU UNTUK MENUTUP MODAL (DIPANGGIL DARI DALAM MODAL)
-    // Anotasi #[On] adalah event listener
     #[On('user-updated')]
     public function closeEditModal()
     {
         $this->showEditModal = false;
         $this->editingUserId = null;
-        $this->loadData(); // Muat ulang data tabel
+        $this->loadData();
         session()->flash('success_user', 'Data user berhasil diperbarui.');
     }
 

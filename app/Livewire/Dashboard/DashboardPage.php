@@ -55,7 +55,7 @@ class DashboardPage extends Component
             $aset->update([
                 'status_validasi' => $this->validasiStatus,
                 'catatan_validasi' => $this->validasiCatatan,
-                'divalidasi_oleh' => auth()->user(),
+                'divalidasi_oleh' => auth()->id(),
             ]);
 
             session()->flash('success', 'Aset berhasil divalidasi.');

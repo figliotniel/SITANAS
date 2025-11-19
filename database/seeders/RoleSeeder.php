@@ -15,7 +15,7 @@ class RoleSeeder extends Seeder
         DB::table('roles')->insert([
             ['nama_role' => 'Admin Desa'],
             ['nama_role' => 'Kepala Desa'],
-            ['nama_role' => 'BPD (Pengawas)'],
+            ['nama_role' => 'BPD'],
         ]);
     }
 }

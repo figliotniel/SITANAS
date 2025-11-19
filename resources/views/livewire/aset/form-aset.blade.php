@@ -1,7 +1,7 @@
 <div>
     <div class="content-header">
         <h1>
-            {{ $this->pageTitle }} {{-- Menggunakan properti $pageTitle dari FormAset.php --}}
+            {{ $pageTitle }}
         </h1>
         <a href="{{ route('dashboard') }}" wire:navigate class="btn btn-secondary">Kembali</a>
     </div>
@@ -13,14 +13,26 @@
                 <div class="grid-2-col">
                     <div class="form-group">
                         <label for="kode_barang">Kode Barang</label>
-                        <input type="text" id="kode_barang" wire:model="kode_barang" class="form-control">
+                        <input type="text" id="kode_barang" wire:model="kode_barang" class="form-control" placeholder="Contoh: TNH-001">
                         @error('kode_barang') <span class="notification error">{{ $message }}</span> @enderror
                     </div>
+
+                    {{-- [UPDATE 1] Menggunakan Datalist untuk Asal Perolehan --}}
                     <div class="form-group">
                         <label for="asal_perolehan">Asal Perolehan</label>
-                        <input type="text" id="asal_perolehan" wire:model="asal_perolehan" class="form-control">
+                        <input type="text" id="asal_perolehan" wire:model="asal_perolehan" class="form-control" list="list-asal" placeholder="Ketik atau pilih...">
+                        <datalist id="list-asal">
+                            <option value="Aset Desa">
+                            <option value="Kekayaan Asli Desa">
+                            <option value="Bantuan Pemerintah Kabupaten">
+                            <option value="Bantuan Pemerintah Provinsi">
+                            <option value="Hibah / Sumbangan">
+                            <option value="Pembelian">
+                            <option value="Tukar Guling">
+                        </datalist>
                         @error('asal_perolehan') <span class="notification error">{{ $message }}</span> @enderror
                     </div>
+
                     <div class="form-group">
                         <label for="luas">Luas (m²)</label>
                         <input type="number" step="0.01" id="luas" wire:model="luas" class="form-control">
@@ -33,7 +45,7 @@
                     </div>
                     <div class="form-group" style="grid-column: span 2;">
                         <label for="lokasi">Lokasi/Alamat</label>
-                        <textarea id="lokasi" wire:model="lokasi" class="form-control"></textarea>
+                        <textarea id="lokasi" wire:model="lokasi" class="form-control" rows="2"></textarea>
                         @error('lokasi') <span class="notification error">{{ $message }}</span> @enderror
                     </div>
                 </div>
@@ -47,8 +59,39 @@
                     <div class="form-group"><label>Bukti Perolehan</label><input type="text" wire:model="bukti_perolehan" class="form-control"></div>
                     <div class="form-group"><label>Nomor Sertifikat</label><input type="text" wire:model="nomor_sertifikat" class="form-control"></div>
                     <div class="form-group"><label>Tanggal Sertifikat</label><input type="date" wire:model="tanggal_sertifikat" class="form-control"></div>
-                    <div class="form-group"><label>Status Tanah (Hak)</label><input type="text" wire:model="status_sertifikat" class="form-control"></div>
-                    <div class="form-group"><label>Penggunaan Lahan</label><input type="text" wire:model="penggunaan" class="form-control"></div>
+                    
+                    {{-- [UPDATE 2] Menggunakan Datalist untuk Status Sertifikat --}}
+                    <div class="form-group">
+                        <label>Status Tanah (Hak)</label>
+                        <input type="text" wire:model="status_sertifikat" class="form-control" list="list-hak" placeholder="Pilih status hak...">
+                        <datalist id="list-hak">
+                            <option value="Tanah Kas Desa">
+                            <option value="Hak Milik">
+                            <option value="Hak Pakai">
+                            <option value="Hak Guna Bangunan">
+                            <option value="Hak Pengelolaan">
+                            <option value="Letter C">
+                            <option value="Petok D">
+                        </datalist>
+                    </div>
+
+                    {{-- [UPDATE 3] Menggunakan Datalist untuk Penggunaan --}}
+                    <div class="form-group">
+                        <label>Penggunaan Lahan</label>
+                        <input type="text" wire:model="penggunaan" class="form-control" list="list-guna" placeholder="Untuk apa lahan ini?">
+                        <datalist id="list-guna">
+                            <option value="Pertanian / Sawah">
+                            <option value="Kebun / Tegalan">
+                            <option value="Kantor Desa">
+                            <option value="Balai Desa">
+                            <option value="Lapangan Olahraga">
+                            <option value="Sekolah / Pendidikan">
+                            <option value="Jalan Desa">
+                            <option value="Kuburan / Makam">
+                            <option value="Pasar Desa">
+                        </datalist>
+                    </div>
+
                     <div class="form-group"><label>Koordinat (Lat, Long)</label><input type="text" wire:model="koordinat" class="form-control"></div>
                     <div class="form-group">
                         <label>Kondisi Aset</label>
@@ -66,7 +109,7 @@
                 </div>
 
                 <button type="submit" class="btn btn-primary" style="margin-top: 1.5rem;">
-                    {{ $this->saveButtonText }} {{-- Menggunakan Computed Property dari FormAset.php --}}
+                    {{ $saveButtonText }}
                 </button>
             </form>
             <div class="form-group" style="grid-column: 1 / -1; margin-top: 1rem;">
@@ -86,6 +129,7 @@
             window.sitanasMap = null;
         }
 
+        // Inisialisasi Peta
         window.sitanasMap = L.map('map').setView([-7.7956, 110.3695], 13);
         var marker;
 
@@ -93,6 +137,20 @@
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(window.sitanasMap);
 
+        // Cek apakah ada koordinat yang sudah tersimpan (dari mode Edit)
+        const currentKoordinat = @this.get('koordinat');
+        if (currentKoordinat) {
+            const parts = currentKoordinat.split(',');
+            const lat = parseFloat(parts[0]);
+            const lng = parseFloat(parts[1]);
+            if (!isNaN(lat) && !isNaN(lng)) {
+                const latLng = [lat, lng];
+                marker = L.marker(latLng).addTo(window.sitanasMap);
+                window.sitanasMap.setView(latLng, 16);
+            }
+        }
+
+        // Event Klik Peta
         window.sitanasMap.on('click', function(e) {
             const lat = e.latlng.lat.toFixed(6);
             const lng = e.latlng.lng.toFixed(6);
@@ -108,6 +166,7 @@
             window.sitanasMap.panTo(e.latlng);
         });
 
+        // Listener Update dari Livewire
         Livewire.on('koordinat-updated', (koordinatString) => {
             if (koordinatString) {
                 const parts = koordinatString.split(',');

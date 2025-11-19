@@ -9,15 +9,17 @@ use App\Models\DokumenPendukung;
 use App\Models\PemanfaatanTanah;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 #[Layout('layouts.app')]
 class DetailPage extends Component
 {
     use WithFileUploads;
+
     public TanahKasDesa $aset;
     public $dokumen_pendukung = [];
+    
+    // Properti Pemanfaatan
     public $p_bentuk_pemanfaatan = 'Sewa';
     public $p_pihak_ketiga;
     public $p_tanggal_mulai;
@@ -26,24 +28,27 @@ class DetailPage extends Component
     public $p_status_pembayaran = 'Belum Lunas';
     public $p_path_bukti;
     public $p_keterangan;
+
+    // Properti Dokumen
     public $fileUpload;
     public $nama_dokumen;
     public $kategori_dokumen = 'Lain-lain';
     public $tanggal_kadaluarsa;
 
+    // Properti Validasi (Kades)
+    public $showValidasiModal = false;
+    public $validasiStatus;
+    public $validasiCatatan;
 
     public function mount(TanahKasDesa $aset)
     {
         $this->aset = $aset->load(['diinput_oleh_user', 'divalidasi_oleh_user']);
-
-        // [BARU] Panggil fungsi untuk memuat dokumen
         $this->loadDokumenPendukung();
     }
 
     public function downloadDetailPdf()
     {
-        $pdf = Pdf::loadView('pdf.detail_aset', ['aset' => $this->aset]);
-        
+        $pdf = Pdf::loadView('pdf.detail-aset', ['aset' => $this->aset]);
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->stream();
         }, 'detail-aset-'.$this->aset->kode_barang.'.pdf');
@@ -52,24 +57,17 @@ class DetailPage extends Component
     public function loadDokumenPendukung()
     {
         $user = Auth::user();
-        
-        // Role yang diizinkan melihat dokumen
-        $allowedRoles = ['Admin Desa', 'Kepala Desa', 'BPN'];
+        $allowedRoles = ['Admin Desa', 'Kepala Desa', 'BPD (Pengawas)'];
 
-        // Cek jika user ada DAN rolenya termasuk dalam daftar di atas
-        if ($user && in_array($user->role->nama_role, $allowedRoles)) {
-            // Muat dokumen dari relasi
+        if ($user && $user->role && in_array($user->role->nama_role, $allowedRoles)) {
             $this->dokumen_pendukung = $this->aset->dokumen()->get();
         }
     }
 
-
-    /**
-     * Fungsi untuk simpan riwayat pemanfaatan
-     * (Ini sudah ada di file Anda, tidak diubah)
-     */
     public function simpanPemanfaatan()
     {
+        if (Auth::user()->role_id != 1) return; 
+
         $validated = $this->validate([
             'p_bentuk_pemanfaatan' => 'required|string',
             'p_pihak_ketiga' => 'required|string|max:255',
@@ -77,7 +75,7 @@ class DetailPage extends Component
             'p_tanggal_selesai' => 'required|date|after_or_equal:p_tanggal_mulai',
             'p_nilai_kontribusi' => 'required|numeric|min:0',
             'p_status_pembayaran' => 'required|string',
-            'p_path_bukti' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048', // maks 2MB
+            'p_path_bukti' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048', 
             'p_keterangan' => 'nullable|string',
         ]);
 
@@ -107,36 +105,60 @@ class DetailPage extends Component
         session()->flash('success_pemanfaatan', 'Riwayat pemanfaatan berhasil ditambahkan.');
     }
 
-    public function render()
-    {
-        return view('livewire.aset.detail-page');
-    }
     public function simpanDokumen()
     {
-        // Validasi
+        if (Auth::user()->role_id != 1) return;
+
         $validated = $this->validate([
-            'fileUpload' => 'required|file|max:10240', // 10MB Max
+            'fileUpload' => 'required|file|mimes:pdf|max:10240', 
             'nama_dokumen' => 'required|string|max:255',
             'kategori_dokumen' => 'required|string',
             'tanggal_kadaluarsa' => 'nullable|date',
         ]);
 
-        // Simpan file
         $path = $this->fileUpload->store('dokumen_pendukung/' . $this->aset->id, 'public');
 
-        // Simpan ke DB
         $this->aset->dokumen()->create([
             'nama_dokumen' => $validated['nama_dokumen'],
-            'file_path' => $path,
-            'tipe_file' => $this->fileUpload->getMimeType(),
-            'kategori' => $validated['kategori_dokumen'],
+            'path_file' => $path,
+            'kategori_dokumen' => $validated['kategori_dokumen'],
             'tanggal_kadaluarsa' => $validated['tanggal_kadaluarsa'],
-            'diinput_oleh' => Auth::id(),
         ]);
 
-        // Reset form
         $this->reset('fileUpload', 'nama_dokumen', 'kategori_dokumen', 'tanggal_kadaluarsa');
-        $this->aset->refresh(); // Refresh data dokumen
-        session()->flash('success_dokumen', 'Dokumen pendukung berhasil ditambahkan.');
+        $this->aset->refresh(); 
+        session()->flash('success_dokumen', 'Dokumen PDF berhasil ditambahkan.');
+    }
+
+
+    public function openValidasiModal($status)
+    {
+        $this->validasiStatus = $status;
+        $this->validasiCatatan = '';
+        $this->showValidasiModal = true;
+    }
+
+    public function closeValidasiModal()
+    {
+        $this->showValidasiModal = false;
+    }
+
+    public function prosesValidasi()
+    {
+        if (Auth::user()->role_id != 2) return;
+
+        $this->aset->update([
+            'status_validasi' => $this->validasiStatus,
+            'catatan_validasi' => $this->validasiCatatan,
+            'divalidasi_oleh' => Auth::id(),
+        ]);
+
+        session()->flash('success_validasi', 'Status aset berhasil diubah menjadi: ' . $this->validasiStatus);
+        $this->closeValidasiModal();
+    }
+
+    public function render()
+    {
+        return view('livewire.aset.detail-page');
     }
 }

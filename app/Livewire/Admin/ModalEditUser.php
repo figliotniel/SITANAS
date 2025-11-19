@@ -56,13 +56,10 @@ class ModalEditUser extends Component
 
         $this->user->update($validated);
 
-        // Kirim event 'user-updated' ke halaman utama untuk menutup modal
         $this->dispatch('user-updated');
     }
 
-    /**
-     * Fungsi untuk simpan password baru
-     */
+
     public function updatePassword()
     {
         $validated = $this->validate([
@@ -73,10 +70,8 @@ class ModalEditUser extends Component
             'password' => Hash::make($validated['new_password'])
         ]);
 
-        // Kosongkan field password
         $this->reset('new_password', 'new_password_confirmation');
 
-        // Tampilkan pesan sukses di dalam modal
         session()->flash('success_pass', 'Password user berhasil di-reset.');
     }
 

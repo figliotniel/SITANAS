@@ -14,45 +14,33 @@ class ArsipAset extends Component
 
     public function mount()
     {
-        // Lindungi halaman ini. Jika bukan Admin, lempar
         if (auth()->user()->role_id != 1) {
             return redirect('/');
         }
     }
 
-    /**
-     * Fungsi untuk PULIHKAN data
-     */
     public function pulihkan($id)
     {
-        // Cari data HANYA di dalam arsip
         $aset = TanahKasDesa::onlyTrashed()->find($id);
 
         if ($aset) {
-            $aset->restore(); // Perintah untuk memulihkan
+            $aset->restore();
             session()->flash('success', 'Data aset berhasil dipulihkan.');
         }
     }
 
-    /**
-     * Fungsi untuk HAPUS PERMANEN
-     */
     public function hapusPermanen($id)
     {
         $aset = TanahKasDesa::onlyTrashed()->find($id);
 
         if ($aset) {
-            // Hapus file dokumen/pemanfaatan terkait (jika perlu)
-            // ... (logika ini bisa ditambah nanti)
-
-            $aset->forceDelete(); // Perintah untuk hapus permanen
+            $aset->forceDelete();
             session()->flash('success', 'Data aset berhasil dihapus permanen.');
         }
     }
 
     public function render()
     {
-        // Ambil data HANYA DARI ARSIP (yang di-soft-delete)
         $asetArsip = TanahKasDesa::onlyTrashed()->paginate(10);
 
         return view('livewire.admin.arsip-aset', [
