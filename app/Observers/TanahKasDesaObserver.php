@@ -18,9 +18,10 @@ class TanahKasDesaObserver
     {
         // Cek apakah ini "Validasi"
         if ($tanahKasDesa->wasChanged('status_validasi')) {
-            // Ambil nama Kades yang memvalidasi
-            $namaValidator = User::find($tanahKasDesa->divalidasi_oleh)->nama_lengkap ?? 'Kades';
-            $this->buatLog('VALIDASI', "Aset {$tanahKasDesa->kode_barang} telah di-{$tanahKasDesa->status_validasi} oleh {$namaValidator}");
+            // Ambil nama Kades yang memvalidasi (safe check untuk null)
+            $validator = User::find($tanahKasDesa->divalidasi_oleh);
+            $namaValidator = $validator?->nama_lengkap ?? 'Kades';
+            $this->buatLog('VALIDASI', "Aset {$tanahKasDesa->kode_barang} telah di-{$tanahKasDesa->status_validasi} oleh {$namaValidator}", $tanahKasDesa->divalidasi_oleh ?? null);
         } else {
             // Jika tidak, anggap ini "Edit" biasa
             $this->buatLog('EDIT', "Memperbarui data aset: {$tanahKasDesa->kode_barang}");
@@ -42,10 +43,10 @@ class TanahKasDesaObserver
         $this->buatLog('HAPUS PERMANEN', "Menghapus permanen data aset: {$tanahKasDesa->kode_barang}");
     }
 
-    private function buatLog($aksi, $deskripsi)
+    private function buatLog($aksi, $deskripsi, $userId = null)
     {
         LogAktivitas::create([
-            'user_id' => Auth::id(), // Otomatis ambil ID user yang login
+            'user_id' => $userId ?? Auth::id(), // Otomatis ambil ID user yang login jika tidak diberikan
             'aksi' => $aksi,
             'deskripsi' => $deskripsi,
             'timestamp' => now()

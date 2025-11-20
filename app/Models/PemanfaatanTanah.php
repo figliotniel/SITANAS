@@ -5,6 +5,39 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id
+ * @property int $tanah_id
+ * @property string $bentuk_pemanfaatan
+ * @property string $pihak_ketiga
+ * @property string $tanggal_mulai
+ * @property string $tanggal_selesai
+ * @property string $nilai_kontribusi
+ * @property string $status_pembayaran
+ * @property string|null $path_bukti
+ * @property string|null $keterangan
+ * @property int|null $diinput_oleh
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property string|null $updated_at
+ * @property-read \App\Models\TanahKasDesa $tanah
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PemanfaatanTanah newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PemanfaatanTanah newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PemanfaatanTanah query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PemanfaatanTanah whereBentukPemanfaatan($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PemanfaatanTanah whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PemanfaatanTanah whereDiinputOleh($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PemanfaatanTanah whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PemanfaatanTanah whereKeterangan($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PemanfaatanTanah whereNilaiKontribusi($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PemanfaatanTanah wherePathBukti($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PemanfaatanTanah wherePihakKetiga($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PemanfaatanTanah whereStatusPembayaran($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PemanfaatanTanah whereTanahId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PemanfaatanTanah whereTanggalMulai($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PemanfaatanTanah whereTanggalSelesai($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PemanfaatanTanah whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class PemanfaatanTanah extends Model
 {
     use HasFactory;
