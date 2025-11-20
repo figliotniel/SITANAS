@@ -1,372 +1,276 @@
-<div class="max-w-7xl mx-auto space-y-8 pb-20" x-data="{ showModalPemanfaatan: false }">
+<div class="max-w-7xl mx-auto space-y-8 pb-20">
     
-    {{-- Notifikasi Sukses --}}
+    {{-- Notifikasi Sukses / Error --}}
     @if (session()->has('success'))
-        <div class="bg-emerald-100 border border-emerald-400 text-emerald-700 px-4 py-3 rounded relative mb-4" role="alert">
-            <span class="block sm:inline">{{ session('success') }}</span>
+        <div class="bg-emerald-100 border border-emerald-400 text-emerald-700 px-4 py-3 rounded-xl relative flex items-center gap-2 shadow-sm">
+            <i class="fas fa-check-circle text-xl"></i>
+            <span class="font-medium">{{ session('success') }}</span>
+        </div>
+    @endif
+    @if (session()->has('error'))
+        <div class="bg-rose-100 border border-rose-400 text-rose-700 px-4 py-3 rounded-xl relative flex items-center gap-2 shadow-sm">
+            <i class="fas fa-exclamation-triangle text-xl"></i>
+            <span class="font-medium">{{ session('error') }}</span>
         </div>
     @endif
 
-    {{-- HEADER SECTION --}}
-    <div class="bg-white rounded-3xl shadow-lg border border-slate-100 overflow-hidden">
-        <div class="bg-slate-50 border-b border-slate-200 px-8 py-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-            {{-- Kiri: Identitas Aset --}}
-            <div class="flex items-start gap-5">
-                <div class="p-4 bg-blue-600 rounded-2xl text-white shadow-lg shadow-blue-500/30 flex-shrink-0">
-                    <i class="fas fa-map-marked-alt text-2xl"></i>
-                </div>
-                <div>
-                    <h1 class="text-2xl font-bold text-slate-900 leading-tight">{{ $aset->lokasi }}</h1>
-                    <div class="flex flex-wrap items-center gap-3 mt-2 text-sm text-slate-500">
-                        <span class="font-mono bg-slate-200 px-2.5 py-1 rounded-md text-slate-700 font-bold tracking-wide border border-slate-300">
-                            {{ $aset->kode_barang ?? 'TANPA-KODE' }}
-                        </span>
-                        <span class="hidden md:inline text-slate-300">•</span>
-                        <span class="flex items-center gap-1.5">
-                            <i class="fas fa-tag text-slate-400"></i>
-                            {{ $aset->penggunaan ?? 'Penggunaan Belum Set' }}
-                        </span>
-                    </div>
+    {{-- BAGIAN 1: HEADER & TOMBOL --}}
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="bg-slate-50 px-8 py-6 border-b border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900">{{ $aset->lokasi }}</h1>
+                <div class="flex items-center gap-3 mt-2 text-sm text-slate-500">
+                    <span class="font-mono bg-white border px-2 py-1 rounded text-slate-600 font-semibold">
+                        {{ $aset->kode_barang ?? 'TANPA KODE' }}
+                    </span>
+                    <span>•</span>
+                    <span>{{ $aset->penggunaan ?? 'Penggunaan Belum Diisi' }}</span>
                 </div>
             </div>
-            
-            {{-- Kanan: Status & Tombol --}}
-            <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                <span class="px-5 py-2.5 rounded-full text-sm font-bold uppercase tracking-wide border shadow-sm
-                    {{ $aset->status_validasi == 'Disetujui' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : '' }}
-                    {{ $aset->status_validasi == 'Ditolak' ? 'bg-rose-50 text-rose-700 border-rose-200' : '' }}
-                    {{ $aset->status_validasi == 'Diproses' ? 'bg-amber-50 text-amber-700 border-amber-200' : '' }}">
-                    {{ $aset->status_validasi }}
-                </span>
-
-                <button wire:click="exportPdf" class="flex items-center gap-2 px-5 py-2.5 bg-white text-rose-600 rounded-xl hover:bg-rose-50 hover:text-rose-700 transition border border-rose-200 shadow-sm font-semibold text-sm group">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                    </svg>
-                    Export PDF
+            <div class="flex gap-3">
+                <button wire:click="exportPdf" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 font-medium text-sm flex items-center gap-2 shadow-sm">
+                    <i class="fas fa-file-pdf text-rose-500"></i> Export PDF
                 </button>
-
-                <a href="{{ route('laporan') }}" class="px-5 py-2.5 bg-slate-800 text-white rounded-xl hover:bg-slate-700 transition shadow-lg shadow-slate-800/20 text-sm font-semibold">
+                <a href="{{ route('dashboard') }}" class="px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 font-medium text-sm shadow-sm">
                     Kembali
                 </a>
             </div>
         </div>
 
-        {{-- CONTENT BODY --}}
-        <div class="p-8 bg-slate-50/50">
+        {{-- Info Ringkas (4 Kotak) --}}
+        <div class="p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="p-5 border border-slate-100 rounded-2xl bg-slate-50/50">
+                <div class="text-xs text-slate-400 uppercase font-bold mb-1">Luas Tanah</div>
+                <div class="text-2xl font-bold text-slate-800">{{ number_format($aset->luas, 0, ',', '.') }} m²</div>
+            </div>
+            <div class="p-5 border border-slate-100 rounded-2xl bg-slate-50/50">
+                <div class="text-xs text-slate-400 uppercase font-bold mb-1">Harga Perolehan</div>
+                <div class="text-2xl font-bold text-emerald-600">Rp {{ number_format($aset->harga_perolehan, 0, ',', '.') }}</div>
+            </div>
+            <div class="p-5 border border-slate-100 rounded-2xl bg-slate-50/50">
+                <div class="text-xs text-slate-400 uppercase font-bold mb-1">Sertifikat</div>
+                <div class="text-lg font-bold text-slate-800">{{ $aset->status_sertifikat }}</div>
+                <div class="text-xs text-slate-500 truncate">{{ $aset->nomor_sertifikat ?? 'No: -' }}</div>
+            </div>
+            <div class="p-5 border border-slate-100 rounded-2xl bg-slate-50/50">
+                <div class="text-xs text-slate-400 uppercase font-bold mb-1">Status Validasi</div>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium
+                    {{ $aset->status_validasi == 'Disetujui' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800' }}">
+                    {{ $aset->status_validasi }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    {{-- BAGIAN 2: PETA & DETAIL (Grid 3 Kolom) --}}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {{-- Kiri: Peta --}}
+        <div class="lg:col-span-2 space-y-6">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex justify-between">
+                    <h3 class="font-bold text-slate-700">Peta Lokasi</h3>
+                    <span class="text-xs font-mono text-slate-400">{{ $aset->koordinat }}</span>
+                </div>
+                <div id="mapDetail" class="h-80 w-full z-0 bg-slate-100"></div>
+            </div>
             
-            {{-- SECTION 1: DATA UTAMA (BOX BESAR) --}}
-            <div class="mb-8">
-                <h3 class="text-lg font-bold text-slate-800 mb-5 flex items-center gap-2">
-                    <i class="fas fa-info-circle text-blue-500"></i> Spesifikasi Tanah
-                </h3>
-                
-                {{-- GRID UTAMA YANG DIMAKSIMALKAN --}}
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    
-                    {{-- Card 1: Luas --}}
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition group">
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Luas Tanah</p>
-                        <div class="flex items-baseline gap-1">
-                            <span class="text-3xl font-extrabold text-slate-800 group-hover:text-blue-600 transition">
-                                {{ number_format($aset->luas, 0, ',', '.') }}
-                            </span>
-                            <span class="text-slate-500 font-medium">m²</span>
-                        </div>
+            {{-- Batas Wilayah --}}
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+                <h3 class="font-bold text-slate-800 mb-4">Batas Wilayah</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                        <span class="text-xs text-slate-400 font-bold uppercase block">Utara</span>
+                        <span class="font-medium text-slate-700">{{ $aset->batas_utara ?? '-' }}</span>
                     </div>
-
-                    {{-- Card 2: Harga --}}
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition group">
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Harga Perolehan</p>
-                        <div class="flex items-baseline gap-1">
-                            <span class="text-lg font-bold text-slate-400 mr-1">Rp</span>
-                            <span class="text-2xl font-extrabold text-slate-800 group-hover:text-emerald-600 transition">
-                                {{ number_format($aset->harga_perolehan, 0, ',', '.') }}
-                            </span>
-                        </div>
+                    <div class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                        <span class="text-xs text-slate-400 font-bold uppercase block">Timur</span>
+                        <span class="font-medium text-slate-700">{{ $aset->batas_timur ?? '-' }}</span>
                     </div>
-
-                    {{-- Card 3: Sertifikat --}}
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Status Sertifikat</p>
-                        <div class="flex flex-col">
-                            <span class="text-xl font-bold text-slate-800 mb-1">
-                                {{ $aset->status_sertifikat ?? '-' }}
-                            </span>
-                            <span class="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded w-fit">
-                                No: {{ $aset->nomor_sertifikat ?? '-' }}
-                            </span>
-                        </div>
+                    <div class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                        <span class="text-xs text-slate-400 font-bold uppercase block">Selatan</span>
+                        <span class="font-medium text-slate-700">{{ $aset->batas_selatan ?? '-' }}</span>
                     </div>
-
-                    {{-- Card 4: Asal Usul --}}
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Asal Usul</p>
-                        <div class="flex flex-col">
-                            <span class="text-xl font-bold text-slate-800 mb-1">
-                                {{ $aset->asal_perolehan ?? '-' }}
-                            </span>
-                            <span class="text-xs text-slate-500">
-                                Tgl: {{ $aset->tanggal_perolehan ? \Carbon\Carbon::parse($aset->tanggal_perolehan)->format('d M Y') : '-' }}
-                            </span>
-                        </div>
+                    <div class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                        <span class="text-xs text-slate-400 font-bold uppercase block">Barat</span>
+                        <span class="font-medium text-slate-700">{{ $aset->batas_barat ?? '-' }}</span>
                     </div>
-
                 </div>
             </div>
+        </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                
-                {{-- LEFT COLUMN: Map & Batas --}}
-                <div class="lg:col-span-2 space-y-8">
-                    
-                    {{-- PETA --}}
-                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                        <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                            <h3 class="font-bold text-slate-800">Peta Lokasi</h3>
-                            <span class="text-xs font-mono text-slate-500">{{ $aset->koordinat }}</span>
-                        </div>
-                        <div id="mapDetail" class="h-96 w-full z-0 relative bg-slate-100"></div>
+        {{-- Kanan: Legalitas --}}
+        <div class="space-y-6">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+                <h3 class="font-bold text-slate-800 mb-4 border-b pb-2">Detail Legalitas</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-xs font-bold text-slate-400 uppercase">NUP</label>
+                        <p class="text-slate-800 font-medium">{{ $aset->nup ?? '-' }}</p>
                     </div>
-
-                    {{-- BATAS WILAYAH --}}
-                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-                        <h3 class="text-lg font-bold text-slate-800 mb-6">Batas Wilayah</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                                <span class="block text-xs font-bold text-slate-400 uppercase mb-1">Utara</span>
-                                <span class="block text-lg font-semibold text-slate-800">{{ $aset->batas_utara ?? '-' }}</span>
-                            </div>
-                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                                <span class="block text-xs font-bold text-slate-400 uppercase mb-1">Timur</span>
-                                <span class="block text-lg font-semibold text-slate-800">{{ $aset->batas_timur ?? '-' }}</span>
-                            </div>
-                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                                <span class="block text-xs font-bold text-slate-400 uppercase mb-1">Selatan</span>
-                                <span class="block text-lg font-semibold text-slate-800">{{ $aset->batas_selatan ?? '-' }}</span>
-                            </div>
-                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                                <span class="block text-xs font-bold text-slate-400 uppercase mb-1">Barat</span>
-                                <span class="block text-lg font-semibold text-slate-800">{{ $aset->batas_barat ?? '-' }}</span>
-                            </div>
-                        </div>
+                    <div>
+                        <label class="text-xs font-bold text-slate-400 uppercase">Bukti Perolehan</label>
+                        <p class="text-slate-800 font-medium">{{ $aset->bukti_perolehan ?? '-' }}</p>
                     </div>
-
-                </div>
-
-                {{-- RIGHT COLUMN: Legalitas & Keterangan --}}
-                <div class="space-y-8">
-                    
-                    {{-- LEGALITAS CARD --}}
-                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                        <div class="bg-blue-50 px-6 py-4 border-b border-blue-100">
-                            <h3 class="font-bold text-blue-900">Detail Legalitas</h3>
-                        </div>
-                        <div class="p-6 space-y-6">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-400 uppercase mb-1">NUP (Nomor Urut Pendaftaran)</label>
-                                <div class="text-lg font-medium text-slate-800 border-b border-slate-100 pb-2">
-                                    {{ $aset->nup ?? '-' }}
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Bukti Perolehan</label>
-                                <div class="text-lg font-medium text-slate-800 border-b border-slate-100 pb-2">
-                                    {{ $aset->bukti_perolehan ?? '-' }}
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Tanggal Sertifikat</label>
-                                <div class="text-lg font-medium text-slate-800 border-b border-slate-100 pb-2">
-                                    {{ $aset->tanggal_sertifikat ? \Carbon\Carbon::parse($aset->tanggal_sertifikat)->format('d F Y') : '-' }}
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Kondisi Tanah</label>
-                                <span class="inline-block mt-1 px-3 py-1 rounded-lg font-bold text-sm 
-                                    {{ $aset->kondisi == 'Baik' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700' }}">
-                                    {{ $aset->kondisi ?? '-' }}
-                                </span>
-                            </div>
-                        </div>
+                    <div>
+                        <label class="text-xs font-bold text-slate-400 uppercase">Kondisi</label>
+                        <p class="text-slate-800 font-medium">{{ $aset->kondisi ?? '-' }}</p>
                     </div>
-
-                    {{-- KETERANGAN CARD --}}
-                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-                        <h3 class="font-bold text-slate-800 mb-4">Keterangan Tambahan</h3>
-                        <p class="text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-100 text-sm">
-                            {{ $aset->keterangan ?? 'Tidak ada keterangan tambahan.' }}
+                    <div>
+                        <label class="text-xs font-bold text-slate-400 uppercase">Keterangan</label>
+                        <p class="text-slate-600 text-sm bg-slate-50 p-3 rounded-lg border mt-1">
+                            {{ $aset->keterangan ?? '-' }}
                         </p>
                     </div>
-
-                </div>
-
-            </div>
-
-            {{-- RIWAYAT PEMANFAATAN (Full Width & Spacious) --}}
-            <div class="mt-8">
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                            <i class="fas fa-history text-amber-500"></i> Riwayat Pemanfaatan
-                        </h3>
-                        {{-- Tombol Tambah Pemanfaatan --}}
-                        <button @click="showModalPemanfaatan = true" class="px-4 py-2 bg-blue-600 text-white text-sm font-bold rounded-lg hover:bg-blue-700 transition shadow flex items-center gap-2">
-                            <i class="fas fa-plus"></i> Tambah Pemanfaatan
-                        </button>
-                    </div>
-                    
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead class="bg-slate-50 border-b border-slate-200">
-                                <tr>
-                                    <th class="px-8 py-5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Tanggal</th>
-                                    <th class="px-8 py-5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Pihak Pemanfaat</th>
-                                    <th class="px-8 py-5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Bentuk Pemanfaatan</th>
-                                    <th class="px-8 py-5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Keterangan</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-100">
-                                @forelse($aset->pemanfaatan ?? [] as $history)
-                                <tr class="hover:bg-slate-50/50 transition">
-                                    <td class="px-8 py-6 whitespace-nowrap font-medium text-slate-700">
-                                        {{ \Carbon\Carbon::parse($history->tanggal)->format('d M Y') }}
-                                    </td>
-                                    <td class="px-8 py-6 whitespace-nowrap text-lg font-semibold text-slate-800">
-                                        {{ $history->pihak_pemanfaat }}
-                                    </td>
-                                    <td class="px-8 py-6">
-                                        <span class="px-3 py-1 rounded-full text-sm font-bold bg-blue-50 text-blue-700 border border-blue-100">
-                                            {{ $history->bentuk_pemanfaatan }}
-                                        </span>
-                                    </td>
-                                    <td class="px-8 py-6 text-slate-600 leading-relaxed max-w-xs">
-                                        {{ $history->keterangan }}
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="4" class="px-8 py-12 text-center text-slate-400">
-                                        <div class="flex flex-col items-center">
-                                            <i class="fas fa-folder-open text-4xl mb-4 opacity-30"></i>
-                                            <p class="text-lg font-medium">Belum ada riwayat pemanfaatan</p>
-                                            <p class="text-sm mt-1">Aset ini belum tercatat dimanfaatkan oleh pihak lain.</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
                 </div>
             </div>
-
         </div>
     </div>
 
-    {{-- MODAL TAMBAH PEMANFAATAN (AlpineJS) --}}
-    <div x-show="showModalPemanfaatan" 
-         x-transition:enter="transition ease-out duration-300"
-         x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100"
-         x-transition:leave="transition ease-in duration-200"
-         x-transition:leave-start="opacity-100"
-         x-transition:leave-end="opacity-0"
-         style="display: none;"
-         class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    {{-- BAGIAN 3: PEMANFAATAN (Form Kiri, Tabel Kanan) --}}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        {{-- KOLOM 1: FORM INPUT (Khusus Admin) --}}
+        @if(Auth::user()->role_id == 1)
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 lg:col-span-1 sticky top-4">
+            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-edit text-blue-600"></i> Catat Pemanfaatan
+            </h3>
             
-            {{-- Overlay --}}
-            <div @click="showModalPemanfaatan = false" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <form wire:submit.prevent="simpanPemanfaatan" class="space-y-4">
+                {{-- Pihak --}}
+                <div>
+                    <label class="text-xs font-bold text-slate-500 uppercase">Pihak Pemanfaat</label>
+                    <input type="text" wire:model="p_pihak_ketiga" class="w-full mt-1 rounded-lg border-slate-300 text-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Nama Penyewa / Instansi">
+                    @error('p_pihak_ketiga') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                </div>
 
-            {{-- Modal Panel --}}
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            
-            <div x-transition:enter="transition ease-out duration-300"
-                 x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                 x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                 x-transition:leave="transition ease-in duration-200"
-                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                 class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full border border-slate-200">
+                {{-- Bentuk --}}
+                <div>
+                    <label class="text-xs font-bold text-slate-500 uppercase">Bentuk Kerjasama</label>
+                    <select wire:model="p_bentuk_pemanfaatan" class="w-full mt-1 rounded-lg border-slate-300 text-sm">
+                        <option value="Sewa">Sewa</option>
+                        <option value="Pinjam Pakai">Pinjam Pakai</option>
+                        <option value="Bangun Guna Serah">Bangun Guna Serah</option>
+                        <option value="Bangun Serah Guna">Bangun Serah Guna</option>
+                        <option value="Kerjasama Pemanfaatan">Kerjasama Pemanfaatan</option>
+                    </select>
+                </div>
+
+                {{-- Tanggal --}}
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-xs font-bold text-slate-500 uppercase">Mulai</label>
+                        <input type="date" wire:model="p_tanggal_mulai" class="w-full mt-1 rounded-lg border-slate-300 text-sm">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-slate-500 uppercase">Selesai</label>
+                        <input type="date" wire:model="p_tanggal_selesai" class="w-full mt-1 rounded-lg border-slate-300 text-sm">
+                    </div>
+                </div>
+                @error('p_tanggal_mulai') <span class="text-red-500 text-xs block">{{ $message }}</span> @enderror
+                @error('p_tanggal_selesai') <span class="text-red-500 text-xs block">{{ $message }}</span> @enderror
+
+                {{-- Nilai --}}
+                <div>
+                    <label class="text-xs font-bold text-slate-500 uppercase">Nilai (Rp)</label>
+                    <input type="number" wire:model="p_nilai_kontribusi" class="w-full mt-1 rounded-lg border-slate-300 text-sm" placeholder="0">
+                    @error('p_nilai_kontribusi') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                </div>
+
+                {{-- Status Bayar --}}
+                <div>
+                    <label class="text-xs font-bold text-slate-500 uppercase">Status Pembayaran</label>
+                    <select wire:model="p_status_pembayaran" class="w-full mt-1 rounded-lg border-slate-300 text-sm">
+                        <option value="Belum Lunas">Belum Lunas</option>
+                        <option value="Lunas">Lunas</option>
+                    </select>
+                </div>
+
+                {{-- Upload Bukti --}}
+                <div>
+                    <label class="text-xs font-bold text-slate-500 uppercase">Upload Bukti (Opsional)</label>
+                    <input type="file" wire:model="p_path_bukti" class="w-full mt-1 text-xs text-slate-500 file:mr-2 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                    @error('p_path_bukti') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                </div>
+
+                {{-- Keterangan --}}
+                <div>
+                    <label class="text-xs font-bold text-slate-500 uppercase">Keterangan</label>
+                    <textarea wire:model="p_keterangan" rows="2" class="w-full mt-1 rounded-lg border-slate-300 text-sm"></textarea>
+                </div>
+
+                <button type="submit" wire:loading.attr="disabled" class="w-full py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition disabled:opacity-50">
+                    <span wire:loading.remove>Simpan Data</span>
+                    <span wire:loading>Menyimpan...</span>
+                </button>
+            </form>
+        </div>
+        @endif
+
+        {{-- KOLOM 2 & 3: TABEL DATA (Lebar) --}}
+        <div class="{{ Auth::user()->role_id == 1 ? 'lg:col-span-2' : 'lg:col-span-3' }}">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-slate-50 px-6 py-4 border-b border-slate-200">
+                    <h3 class="font-bold text-slate-800">Riwayat Pemanfaatan</h3>
+                </div>
                 
-                <form wire:submit.prevent="simpanPemanfaatan">
-                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                        <div class="sm:flex sm:items-start">
-                            <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
-                                <i class="fas fa-handshake text-blue-600"></i>
-                            </div>
-                            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                                <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                                    Tambah Pemanfaatan
-                                </h3>
-                                <div class="mt-4 space-y-4">
-                                    
-                                    {{-- Input Pihak Pemanfaat --}}
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Pihak Pemanfaat</label>
-                                        <input type="text" wire:model="pihak_pemanfaat" class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500" placeholder="Contoh: Gapoktan Makmur">
-                                        @error('pihak_pemanfaat') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs text-slate-500 uppercase bg-slate-50 border-b">
+                            <tr>
+                                <th class="px-6 py-3">Tanggal</th>
+                                <th class="px-6 py-3">Pihak</th>
+                                <th class="px-6 py-3">Bentuk / Nilai</th>
+                                <th class="px-6 py-3">Ket / Bukti</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            @forelse($aset->pemanfaatan->sortByDesc('created_at') as $item)
+                            <tr class="hover:bg-slate-50 transition">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="font-bold text-slate-700">{{ \Carbon\Carbon::parse($item->tanggal_mulai)->format('d/m/Y') }}</div>
+                                    <div class="text-xs text-slate-400">s/d {{ \Carbon\Carbon::parse($item->tanggal_selesai)->format('d/m/Y') }}</div>
+                                </td>
+                                <td class="px-6 py-4 font-medium text-slate-900">
+                                    {{ $item->pihak_ketiga }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="px-2 py-1 text-xs font-bold rounded bg-blue-50 text-blue-700 border border-blue-100">
+                                        {{ $item->bentuk_pemanfaatan }}
+                                    </span>
+                                    <div class="mt-1 font-mono text-slate-600">Rp {{ number_format($item->nilai_kontribusi, 0, ',', '.') }}</div>
+                                    <div class="text-xs font-bold {{ $item->status_pembayaran == 'Lunas' ? 'text-emerald-500' : 'text-rose-500' }}">
+                                        {{ $item->status_pembayaran }}
                                     </div>
-
-                                    {{-- Input Bentuk Pemanfaatan --}}
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Bentuk Pemanfaatan</label>
-                                        <select wire:model="bentuk_pemanfaatan" class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                                            <option value="">Pilih Bentuk...</option>
-                                            <option value="Sewa">Sewa</option>
-                                            <option value="Pinjam Pakai">Pinjam Pakai</option>
-                                            <option value="Bangun Guna Serah">Bangun Guna Serah</option>
-                                            <option value="Bangun Serah Guna">Bangun Serah Guna</option>
-                                            <option value="Kerjasama Pemanfaatan">Kerjasama Pemanfaatan</option>
-                                        </select>
-                                        @error('bentuk_pemanfaatan') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                                    </div>
-
-                                    {{-- Input Tanggal --}}
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Mulai</label>
-                                        <input type="date" wire:model="tanggal_pemanfaatan" class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                                        @error('tanggal_pemanfaatan') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                                    </div>
-
-                                    {{-- Input Keterangan --}}
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Keterangan</label>
-                                        <textarea wire:model="keterangan_pemanfaatan" rows="3" class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500" placeholder="Catatan tambahan..."></textarea>
-                                        @error('keterangan_pemanfaatan') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-slate-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                        <button type="submit" class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
-                            Simpan
-                        </button>
-                        <button @click="showModalPemanfaatan = false" type="button" class="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                            Batal
-                        </button>
-                    </div>
-                </form>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="text-slate-600 max-w-[150px] truncate">{{ $item->keterangan ?? '-' }}</div>
+                                    @if($item->path_bukti)
+                                        <a href="{{ asset('storage/'.$item->path_bukti) }}" target="_blank" class="text-blue-600 hover:underline text-xs font-bold mt-1 block">
+                                            <i class="fas fa-paperclip"></i> Lihat Bukti
+                                        </a>
+                                    @endif
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="4" class="px-6 py-12 text-center text-slate-400">
+                                    <i class="fas fa-folder-open text-4xl mb-3 opacity-30"></i>
+                                    <p>Belum ada data riwayat.</p>
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-
 </div>
 
+{{-- Script Peta --}}
 @script
 <script>
-    // Event listener untuk menutup modal setelah sukses simpan
-    Livewire.on('pemanfaatan-stored', () => {
-        // Mengakses scope alpineJS untuk menutup modal
-        // Cara paling aman di livewire v3 dengan alpine inline:
-        document.querySelector('[x-data]').__x.$data.showModalPemanfaatan = false;
-    });
-
-    // Script Peta Detail
     Livewire.hook('morph.updated', () => { initDetailMap(); });
     initDetailMap();
 
@@ -382,25 +286,21 @@
 
         const container = document.getElementById('mapDetail');
         if(container) {
-            if (container._leaflet_id) {
-                container._leaflet_id = null;
-            }
+            // Reset map container jika sudah ada isinya agar tidak error
+            if (container._leaflet_id) container._leaflet_id = null;
             container.innerHTML = "";
 
-            var map = L.map('mapDetail', {
-                zoomControl: true,
-                scrollWheelZoom: false
-            }).setView([lat, lng], 16);
+            var map = L.map('mapDetail', { zoomControl: true, scrollWheelZoom: false }).setView([lat, lng], 16);
             
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: ''
+                attribution: '&copy; OpenStreetMap'
             }).addTo(map);
             
             L.marker([lat, lng]).addTo(map)
                 .bindPopup("<b>{{ $aset->lokasi }}</b><br>Luas: {{ $aset->luas }} m²")
                 .openPopup();
-
-            setTimeout(() => { map.invalidateSize(); }, 100);
+            
+            setTimeout(() => { map.invalidateSize(); }, 300);
         }
     }
 </script>
