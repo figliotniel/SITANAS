@@ -16,7 +16,7 @@
         <livewire:navigasi.top-bar />
     @endauth
 
-    <main class="content" style="padding: 2rem;">
+    <main class="content">
         {{ $slot }}
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     </main>

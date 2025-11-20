@@ -21,8 +21,6 @@ class DashboardPage extends Component
 
     public function updatingSearchTerm() { $this->resetPage(); }
     public function updatingFilterStatus() { $this->resetPage(); }
-
-    // Fungsi Arsipkan (dari langkah 8, jangan diubah)
     public function arsipkan($id)
     {
         $aset = TanahKasDesa::find($id);
