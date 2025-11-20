@@ -7,20 +7,32 @@ use Livewire\Attributes\Layout;
 use App\Models\TanahKasDesa;
 use Livewire\WithPagination;
 
-#[Layout('layouts.app')] // Kita tetap pakai layout utama
+#[Layout('layouts.app')]
 class HalamanPublik extends Component
 {
     use WithPagination;
 
+    public $search = ''; 
+
     public function render()
     {
-        // Ambil data (persis seperti logika publik.php lama)
-        $asetPublik = TanahKasDesa::where('status_validasi', 'Disetujui')
-                                ->orderBy('id', 'desc')
-                                ->paginate(15); // 15 data per halaman
+        $query = TanahKasDesa::where('status_validasi', 'Disetujui');
+
+
+        if ($this->search) {
+            $query->where(function($q) {
+                $q->where('lokasi', 'like', '%' . $this->search . '%')
+                  ->orWhere('kode_barang', 'like', '%' . $this->search . '%')
+                  ->orWhere('penggunaan', 'like', '%' . $this->search . '%')
+                  ->orWhere('keterangan', 'like', '%' . $this->search . '%');
+            });
+        }
+
+
+        $dataAset = $query->orderBy('updated_at', 'desc')->paginate(12);
 
         return view('livewire.public.halaman-publik', [
-            'asetPublik' => $asetPublik
+            'aset' => $dataAset
         ]);
     }
 }

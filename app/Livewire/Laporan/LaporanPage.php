@@ -25,7 +25,7 @@ class LaporanPage extends Component
 
     /**
      * [OPTIMASI] Fungsi Pusat Query
-     * Dipakai oleh render() dan downloadPdf() agar hasil konsisten
+     * Dipakai oleh render() dan exportPdf() agar hasil konsisten
      */
     private function buildQuery()
     {
@@ -46,18 +46,23 @@ class LaporanPage extends Component
             ->orderBy('created_at', 'desc'); // Urutkan dari yang terbaru
     }
 
-    public function downloadPdf()
+    // PERBAIKAN: Nama fungsi diubah dari 'downloadPdf' menjadi 'exportPdf'
+    // agar sesuai dengan panggilan wire:click="exportPdf" di Blade
+    public function exportPdf()
     {
         // 1. Ambil data menggunakan Query yang sama dengan tabel (Tanpa Paginasi)
         $dataAset = $this->buildQuery()->get();
 
         // 2. Cek jika data kosong
         if ($dataAset->isEmpty()) {
+            // Menggunakan dispatch event browser agar notifikasi lebih interaktif (opsional)
+            // atau flash message standar
             session()->flash('error', 'Tidak ada data yang sesuai filter untuk diunduh.');
             return;
         }
 
         // 3. Load View PDF
+        // Pastikan view 'pdf.laporan-aset' benar-benar ada di resources/views/pdf/
         $pdf = Pdf::loadView('pdf.laporan-aset', ['dataAset' => $dataAset]);
         $pdf->setPaper('a4', 'landscape');
 
@@ -65,8 +70,11 @@ class LaporanPage extends Component
         $statusLabel = $this->filterStatus ? $this->filterStatus : 'Semua-Status';
         $fileName = 'Laporan-Aset-' . $statusLabel . '-' . date('d-m-Y') . '.pdf';
 
+        // 5. Return stream download
         return response()->streamDownload(function () use ($pdf) {
-            echo $pdf->stream();
+            // Gunakan output() bukan stream() di dalam streamDownload 
+            // untuk menghindari konflik header HTTP
+            echo $pdf->output();
         }, $fileName);
     }
 
@@ -77,7 +85,7 @@ class LaporanPage extends Component
 
         return view('livewire.laporan.laporan-page', [
             'aset_tanah' => $aset,
-            'total_aset' => $this->buildQuery()->count() // Hitung total sesuai filter
+            'total_aset' => $this->buildQuery()->count()
         ]);
     }
 }

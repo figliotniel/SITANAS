@@ -46,12 +46,29 @@ class DetailPage extends Component
         $this->loadDokumenPendukung();
     }
 
-    public function downloadDetailPdf()
+    public function exportPdf()
     {
+        // Pastikan data aset ada
+        if (!$this->aset) {
+            session()->flash('error', 'Data aset tidak ditemukan.');
+            return;
+        }
+
+        // Load View PDF (File yang sudah Anda perbaiki sebelumnya)
+        // Pastikan file 'detail-aset.blade.php' ada di folder 'resources/views/pdf/'
         $pdf = Pdf::loadView('pdf.detail-aset', ['aset' => $this->aset]);
+        
+        // Atur ukuran kertas (Opsional, default A4)
+        $pdf->setPaper('a4', 'portrait');
+
+        // Buat nama file yang rapi
+        $kode = $this->aset->kode_barang ?? 'TANPA-KODE';
+        $fileName = 'Detail-Aset-' . $kode . '.pdf';
+
+        // Download
         return response()->streamDownload(function () use ($pdf) {
-            echo $pdf->stream();
-        }, 'detail-aset-'.$this->aset->kode_barang.'.pdf');
+            echo $pdf->output();
+        }, $fileName);
     }
 
     public function loadDokumenPendukung()

@@ -14,6 +14,8 @@ class DashboardPage extends Component
 
     public $searchTerm = '';
     public $filterStatus = '';
+    
+    // Properti Modal Validasi
     public $showValidasiModal = false;
     public $validasiAsetId;
     public $validasiStatus;
@@ -21,6 +23,7 @@ class DashboardPage extends Component
 
     public function updatingSearchTerm() { $this->resetPage(); }
     public function updatingFilterStatus() { $this->resetPage(); }
+
     public function arsipkan($id)
     {
         $aset = TanahKasDesa::find($id);
@@ -29,26 +32,30 @@ class DashboardPage extends Component
             session()->flash('success', 'Data aset berhasil diarsipkan.');
         }
     }
+
     public function openValidasiModal($id, $status)
     {
         $this->validasiAsetId = $id;
         $this->validasiStatus = $status;
-        $this->validasiCatatan = '';
+        $this->validasiCatatan = ''; // Reset catatan
         $this->showValidasiModal = true;
     }
 
     public function closeValidasiModal()
     {
         $this->showValidasiModal = false;
+        $this->reset(['validasiAsetId', 'validasiStatus', 'validasiCatatan']);
     }
 
     public function prosesValidasi()
     {
         if (auth()->user()->role_id != 2) {
+            session()->flash('error', 'Anda tidak memiliki hak akses untuk memvalidasi.');
             return;
         }
 
         $aset = TanahKasDesa::find($this->validasiAsetId);
+        
         if ($aset) {
             $aset->update([
                 'status_validasi' => $this->validasiStatus,
@@ -56,7 +63,9 @@ class DashboardPage extends Component
                 'divalidasi_oleh' => auth()->id(),
             ]);
 
-            session()->flash('success', 'Aset berhasil divalidasi.');
+            $pesan = $this->validasiStatus == 'Disetujui' ? 'Aset berhasil DISETUJUI.' : 'Aset berhasil DITOLAK.';
+            session()->flash('success', $pesan);
+            
             $this->closeValidasiModal();
         }
     }
@@ -73,7 +82,8 @@ class DashboardPage extends Component
                 $q->where('status_validasi', $this->filterStatus);
             });
 
-        $aset = $query->paginate(10);
+        // Urutkan dari yang terbaru
+        $aset = $query->orderBy('created_at', 'desc')->paginate(10);
 
         return view('livewire.dashboard.dashboard-page', [
             'aset_tanah' => $aset
