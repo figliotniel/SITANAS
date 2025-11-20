@@ -4,6 +4,7 @@
             <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Dashboard Aset</h1>
             <p class="text-sm text-slate-500 mt-1">Monitor status persetujuan dan kelola tanah desa.</p>
         </div>
+        {{-- Cek Role ID 1 (Admin) --}}
         @if(auth()->user()->role_id == 1)
             <a href="{{ route('aset.tambah') }}" wire:navigate class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 shadow-sm shadow-blue-500/30 transition-all hover:-translate-y-0.5">
                 <i class="fas fa-plus mr-2"></i> Tambah Tanah
@@ -95,6 +96,7 @@
                                     <i class="fas fa-eye text-lg"></i>
                                 </a>
 
+                                {{-- Tombol Edit & Arsip (Hanya Role 1 / Admin) --}}
                                 @if(auth()->user()->role_id == 1)
                                     <a href="{{ route('aset.edit', ['aset' => $aset->id]) }}" wire:navigate class="p-1 text-slate-400 hover:text-amber-500 transition-colors" title="Edit">
                                         <i class="fas fa-edit text-lg"></i>
@@ -108,7 +110,9 @@
                                     </button>
                                 @endif
 
-                                @if(in_array(auth()->user()->role_id, [2]) && $aset->status_validasi == 'Diproses')
+                                {{-- Tombol Validasi (Hanya Role 2 / Kades) & Status 'Diproses' --}}
+                                {{-- PERBAIKAN DI SINI: Ganti in_array dengan perbandingan langsung --}}
+                                @if(auth()->user()->role_id == 2 && $aset->status_validasi == 'Diproses')
                                     <button 
                                         wire:click="openValidasiModal({{ $aset->id }}, 'Disetujui')" 
                                         class="p-1 text-emerald-400 hover:text-emerald-600 transition-transform hover:scale-110" 
@@ -141,6 +145,7 @@
         </div>
     </div>
 
+    {{-- MODAL VALIDASI --}}
     @if($showValidasiModal)
     <div class="fixed inset-0 z-[100] overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" aria-hidden="true" wire:click="closeValidasiModal"></div>

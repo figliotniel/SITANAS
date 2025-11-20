@@ -5,8 +5,6 @@ namespace App\Livewire\Aset;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 use App\Models\TanahKasDesa;
-use App\Models\DokumenPendukung;
-use App\Models\PemanfaatanTanah;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -17,161 +15,90 @@ class DetailPage extends Component
     use WithFileUploads;
 
     public TanahKasDesa $aset;
-    public $dokumen_pendukung = [];
-    
-    // Properti Pemanfaatan
-    public $p_bentuk_pemanfaatan = 'Sewa';
+
+    // --- VARIABEL FORM INPUT PEMANFAATAN (Wajib Sinkron dengan View) ---
     public $p_pihak_ketiga;
+    public $p_bentuk_pemanfaatan = 'Sewa';
     public $p_tanggal_mulai;
     public $p_tanggal_selesai;
-    public $p_nilai_kontribusi = 0;
+    public $p_nilai_kontribusi;
     public $p_status_pembayaran = 'Belum Lunas';
     public $p_path_bukti;
     public $p_keterangan;
 
-    // Properti Dokumen
-    public $fileUpload;
-    public $nama_dokumen;
-    public $kategori_dokumen = 'Lain-lain';
-    public $tanggal_kadaluarsa;
-
-    // Properti Validasi (Kades)
-    public $showValidasiModal = false;
-    public $validasiStatus;
-    public $validasiCatatan;
-
     public function mount(TanahKasDesa $aset)
     {
-        $this->aset = $aset->load(['diinput_oleh_user', 'divalidasi_oleh_user']);
-        $this->loadDokumenPendukung();
-    }
-
-    public function exportPdf()
-    {
-        // Pastikan data aset ada
-        if (!$this->aset) {
-            session()->flash('error', 'Data aset tidak ditemukan.');
-            return;
-        }
-
-        // Load View PDF (File yang sudah Anda perbaiki sebelumnya)
-        // Pastikan file 'detail-aset.blade.php' ada di folder 'resources/views/pdf/'
-        $pdf = Pdf::loadView('pdf.detail-aset', ['aset' => $this->aset]);
-        
-        // Atur ukuran kertas (Opsional, default A4)
-        $pdf->setPaper('a4', 'portrait');
-
-        // Buat nama file yang rapi
-        $kode = $this->aset->kode_barang ?? 'TANPA-KODE';
-        $fileName = 'Detail-Aset-' . $kode . '.pdf';
-
-        // Download
-        return response()->streamDownload(function () use ($pdf) {
-            echo $pdf->output();
-        }, $fileName);
-    }
-
-    public function loadDokumenPendukung()
-    {
-        $user = Auth::user();
-        $allowedRoles = ['Admin Desa', 'Kepala Desa', 'BPD (Pengawas)'];
-
-        if ($user && $user->role && in_array($user->role->nama_role, $allowedRoles)) {
-            $this->dokumen_pendukung = $this->aset->dokumen()->get();
-        }
+        // Load relasi agar tidak berat saat query
+        $this->aset = $aset->load(['pemanfaatan', 'diinput_oleh_user', 'divalidasi_oleh_user']);
     }
 
     public function simpanPemanfaatan()
     {
-        if (Auth::user()->role_id != 1) return; 
+        // 1. Cek apakah user adalah Admin (Role ID 1)
+        if (Auth::user()->role_id != 1) {
+            session()->flash('error', 'Akses Ditolak: Hanya Admin yang boleh menambah data.');
+            return;
+        }
 
+        // 2. Validasi Input
         $validated = $this->validate([
+            'p_pihak_ketiga'       => 'required|string|max:255',
             'p_bentuk_pemanfaatan' => 'required|string',
-            'p_pihak_ketiga' => 'required|string|max:255',
-            'p_tanggal_mulai' => 'required|date',
-            'p_tanggal_selesai' => 'required|date|after_or_equal:p_tanggal_mulai',
-            'p_nilai_kontribusi' => 'required|numeric|min:0',
-            'p_status_pembayaran' => 'required|string',
-            'p_path_bukti' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048', 
-            'p_keterangan' => 'nullable|string',
+            'p_tanggal_mulai'      => 'required|date',
+            'p_tanggal_selesai'    => 'required|date|after_or_equal:p_tanggal_mulai',
+            'p_nilai_kontribusi'   => 'required|numeric|min:0',
+            'p_status_pembayaran'  => 'required|string',
+            'p_path_bukti'         => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120', // Maks 5MB
+            'p_keterangan'         => 'nullable|string',
+        ], [
+            'p_tanggal_selesai.after_or_equal' => 'Tanggal selesai tidak boleh sebelum tanggal mulai.',
+            'p_nilai_kontribusi.required' => 'Nilai kontribusi wajib diisi (isi 0 jika gratis).',
         ]);
 
+        // 3. Proses Upload Bukti (Jika ada)
         $pathBukti = null;
         if ($this->p_path_bukti) {
+            // Simpan ke folder: storage/app/public/bukti_pemanfaatan/{ID_ASET}
             $pathBukti = $this->p_path_bukti->store('bukti_pemanfaatan/' . $this->aset->id, 'public');
         }
 
+        // 4. Simpan ke Database
         $this->aset->pemanfaatan()->create([
+            'pihak_ketiga'       => $validated['p_pihak_ketiga'],
             'bentuk_pemanfaatan' => $validated['p_bentuk_pemanfaatan'],
-            'pihak_ketiga' => $validated['p_pihak_ketiga'],
-            'tanggal_mulai' => $validated['p_tanggal_mulai'],
-            'tanggal_selesai' => $validated['p_tanggal_selesai'],
-            'nilai_kontribusi' => $validated['p_nilai_kontribusi'],
-            'status_pembayaran' => $validated['p_status_pembayaran'],
-            'path_bukti' => $pathBukti,
-            'keterangan' => $validated['p_keterangan'],
-            'diinput_oleh' => Auth::id(),
+            'tanggal_mulai'      => $validated['p_tanggal_mulai'],
+            'tanggal_selesai'    => $validated['p_tanggal_selesai'],
+            'nilai_kontribusi'   => $validated['p_nilai_kontribusi'],
+            'status_pembayaran'  => $validated['p_status_pembayaran'],
+            'path_bukti'         => $pathBukti,
+            'keterangan'         => $validated['p_keterangan'],
+            'diinput_oleh'       => Auth::id(),
         ]);
 
-        $this->reset(
-            'p_bentuk_pemanfaatan', 'p_pihak_ketiga', 'p_tanggal_mulai', 
+        // 5. Reset Form agar kosong kembali
+        $this->reset([
+            'p_pihak_ketiga', 'p_bentuk_pemanfaatan', 'p_tanggal_mulai', 
             'p_tanggal_selesai', 'p_nilai_kontribusi', 'p_status_pembayaran', 
             'p_path_bukti', 'p_keterangan'
-        );
+        ]);
+
+        // 6. Refresh data aset agar tabel terupdate otomatis
         $this->aset->refresh();
-        session()->flash('success_pemanfaatan', 'Riwayat pemanfaatan berhasil ditambahkan.');
+        session()->flash('success', 'Data pemanfaatan berhasil disimpan.');
     }
 
-    public function simpanDokumen()
+    public function exportPdf()
     {
-        if (Auth::user()->role_id != 1) return;
+        if (!$this->aset) return;
+        
+        $pdf = Pdf::loadView('pdf.detail-aset', ['aset' => $this->aset]);
+        $pdf->setPaper('a4', 'portrait');
 
-        $validated = $this->validate([
-            'fileUpload' => 'required|file|mimes:pdf|max:10240', 
-            'nama_dokumen' => 'required|string|max:255',
-            'kategori_dokumen' => 'required|string',
-            'tanggal_kadaluarsa' => 'nullable|date',
-        ]);
-
-        $path = $this->fileUpload->store('dokumen_pendukung/' . $this->aset->id, 'public');
-
-        $this->aset->dokumen()->create([
-            'nama_dokumen' => $validated['nama_dokumen'],
-            'path_file' => $path,
-            'kategori_dokumen' => $validated['kategori_dokumen'],
-            'tanggal_kadaluarsa' => $validated['tanggal_kadaluarsa'],
-        ]);
-
-        $this->reset('fileUpload', 'nama_dokumen', 'kategori_dokumen', 'tanggal_kadaluarsa');
-        $this->aset->refresh(); 
-        session()->flash('success_dokumen', 'Dokumen PDF berhasil ditambahkan.');
-    }
-
-
-    public function openValidasiModal($status)
-    {
-        $this->validasiStatus = $status;
-        $this->validasiCatatan = '';
-        $this->showValidasiModal = true;
-    }
-
-    public function closeValidasiModal()
-    {
-        $this->showValidasiModal = false;
-    }
-
-    public function prosesValidasi()
-    {
-        if (Auth::user()->role_id != 2) return;
-
-        $this->aset->update([
-            'status_validasi' => $this->validasiStatus,
-            'catatan_validasi' => $this->validasiCatatan,
-            'divalidasi_oleh' => Auth::id(),
-        ]);
-
-        session()->flash('success_validasi', 'Status aset berhasil diubah menjadi: ' . $this->validasiStatus);
-        $this->closeValidasiModal();
+        $namaFile = 'Detail-Aset-' . ($this->aset->kode_barang ?? 'X') . '.pdf';
+        
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->output();
+        }, $namaFile);
     }
 
     public function render()
