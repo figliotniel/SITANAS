@@ -1,4 +1,4 @@
-<div class="max-w-7xl mx-auto space-y-8">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
     <div>
         <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Manajemen Pengguna</h1>
         <p class="text-sm text-slate-500 mt-1">Kelola akun, hak akses, dan status pengguna aplikasi.</p>

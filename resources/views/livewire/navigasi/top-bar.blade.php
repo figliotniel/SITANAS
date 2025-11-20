@@ -1,8 +1,11 @@
 <nav class="sticky top-0 z-50 w-full bg-slate-900 border-b border-slate-800 shadow-lg" x-data="{ mobileMenuOpen: false }">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    {{-- PERBAIKAN: Mengganti 'max-w-7xl mx-auto' menjadi 'w-full' agar presisi dari ujung ke ujung --}}
+    <div class="w-full px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             
+            {{-- SISI KIRI (Logo & Menu Utama) --}}
             <div class="flex items-center">
+                {{-- Logo --}}
                 <a href="{{ route('dashboard') }}" wire:navigate class="flex-shrink-0 flex items-center gap-3 group">
                     <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-blue-500/50 shadow-lg group-hover:scale-105 transition-transform">
                         <i class="fas fa-landmark text-sm"></i>
@@ -10,6 +13,7 @@
                     <span class="font-bold text-xl text-white tracking-tight">SITANAS</span>
                 </a>
 
+                {{-- Menu Desktop --}}
                 <div class="hidden md:ml-10 md:flex md:items-center md:space-x-4">
                     <a href="{{ route('dashboard') }}" wire:navigate class="px-3 py-2 rounded-md text-sm font-medium transition-colors {{ request()->routeIs('dashboard') ? 'bg-slate-800 text-blue-400' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
                         <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
@@ -53,6 +57,7 @@
                 </div>
             </div>
 
+            {{-- SISI KANAN (User Profile & Logout) --}}
             <div class="hidden md:flex items-center ml-6 pl-6 border-l border-slate-700">
                 <div class="flex flex-col text-right mr-4">
                     <span class="text-sm font-semibold text-white">{{ auth()->user()->nama_lengkap }}</span>
@@ -62,6 +67,15 @@
                     <i class="fas fa-power-off"></i>
                 </button>
             </div>
+        </div>
+    </div>
+
+    {{-- (Opsional) MENU MOBILE DROPDOWN (Perlu ditambahkan jika belum ada) --}}
+    <div class="md:hidden bg-slate-900 border-b border-slate-800" id="mobile-menu" x-show="mobileMenuOpen" x-collapse>
+        <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+            <a href="{{ route('dashboard') }}" wire:navigate class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-slate-800">Dashboard</a>
+            <a href="{{ route('laporan') }}" wire:navigate class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-slate-800">Laporan</a>
+            {{-- Tambahkan menu admin mobile di sini jika perlu --}}
         </div>
     </div>
 </nav>

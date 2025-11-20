@@ -7,7 +7,8 @@ use Livewire\Attributes\Layout;
 use App\Models\TanahKasDesa;
 use Livewire\WithPagination;
 
-#[Layout('layouts.app')]
+// UBAH DARI 'layouts.app' MENJADI 'layouts.public'
+#[Layout('layouts.public')] 
 class HalamanPublik extends Component
 {
     use WithPagination;
@@ -18,7 +19,6 @@ class HalamanPublik extends Component
     {
         $query = TanahKasDesa::where('status_validasi', 'Disetujui');
 
-
         if ($this->search) {
             $query->where(function($q) {
                 $q->where('lokasi', 'like', '%' . $this->search . '%')
@@ -27,7 +27,6 @@ class HalamanPublik extends Component
                   ->orWhere('keterangan', 'like', '%' . $this->search . '%');
             });
         }
-
 
         $dataAset = $query->orderBy('updated_at', 'desc')->paginate(12);
 

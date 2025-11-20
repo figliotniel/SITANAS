@@ -24,11 +24,11 @@
 <body class="h-full font-sans antialiased text-slate-900 selection:bg-blue-500 selection:text-white">
 
     <div class="min-h-screen flex flex-col">
-        {{-- Opsional: Tampilkan TopBar jika user login, atau hilangkan sama sekali --}}
         @auth
             <livewire:navigasi.top-bar />
         @endauth
 
+        {{-- Layout ini menggunakan w-full agar konten bisa full screen --}}
         <main class="flex-1 w-full">
             {{ $slot }}
         </main>

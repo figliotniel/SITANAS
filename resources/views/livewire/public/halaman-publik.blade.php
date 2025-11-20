@@ -1,7 +1,8 @@
 <div class="min-h-screen bg-slate-50">
     <div class="bg-slate-900 relative overflow-hidden">
         <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10 text-center">
+        
+        <div class="w-full px-4 sm:px-6 lg:px-12 py-20 relative z-10 text-center">
             <h1 class="text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-6">
                 Transparansi Aset Desa<br>
                 <span class="text-blue-400">Untuk Kemajuan Bersama</span>
@@ -31,7 +32,7 @@
         </div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="w-full px-4 sm:px-6 lg:px-12 py-12">
         <div class="flex justify-between items-end mb-8">
             <div>
                 <h2 class="text-2xl font-bold text-slate-900">Daftar Aset Tanah</h2>
@@ -42,7 +43,7 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 lg:gap-8">
             @forelse($aset as $item)
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 hover:shadow-lg transition-all duration-300 group flex flex-col h-full">
                     <div class="h-40 bg-slate-100 relative overflow-hidden rounded-t-2xl border-b border-slate-100">
@@ -79,7 +80,6 @@
                             <span class="text-xs font-medium text-slate-400">
                                 Update: {{ $item->updated_at->diffForHumans() }}
                             </span>
-                            {{-- Anda bisa menambahkan link detail publik jika mau --}}
                         </div>
                     </div>
                 </div>
@@ -100,7 +100,7 @@
     </div>
     
     <footer class="bg-white border-t border-slate-200 mt-12 py-8">
-        <div class="max-w-7xl mx-auto px-4 text-center text-slate-400 text-sm">
+        <div class="w-full px-4 text-center text-slate-400 text-sm">
             &copy; {{ date('Y') }} Sistem Informasi Tanah Desa. Dilindungi Undang-Undang.
         </div>
     </footer>

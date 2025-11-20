@@ -12,6 +12,31 @@ use App\Livewire\Laporan\LaporanPage;
 use App\Livewire\Admin\ArsipAset;
 use App\Livewire\Public\HalamanPublik;
 use App\Livewire\Admin\LogAktivitasPage;
+use Illuminate\Http\Request;
+use App\Models\TanahKasDesa;
+
+Route::post('/test-input-k6', function (Request $request) {
+    
+    // Kita isi data wajib dengan dummy dari k6 + default value
+    TanahKasDesa::create([
+        'kode_barang'       => 'K6-TEST-' . rand(1000, 9999), // Kode acak
+        'nup'               => rand(1, 100),
+        'asal_perolehan'    => 'Load Testing k6',
+        'tanggal_perolehan' => now(),
+        
+        // Data ini dikirim dari script k6
+        'luas'              => $request->luas, 
+        'lokasi'            => $request->lokasi,
+        'keterangan'        => $request->keterangan,
+        
+        // Data default lainnya
+        'kondisi'           => 'Baik',
+        'status_validasi'   => 'Draft',
+        'diinput_oleh'      => 1, // Asumsi ada User dengan ID 1 (Admin)
+    ]);
+
+    return response()->json(['message' => 'Data Masuk'], 201);
+});
 
 
 Route::get('/publik', HalamanPublik::class)->name('publik');
