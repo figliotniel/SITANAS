@@ -5,7 +5,7 @@ namespace App\Providers;
 use App\Models\TanahKasDesa;
 use App\Observers\TanahKasDesaObserver;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Event; // Pastikan 'Event' di-import jika Anda menggunakannya
+use Illuminate\Support\Facades\Event;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -23,13 +23,7 @@ class EventServiceProvider extends ServiceProvider
      *
      * @var array
      */
-    protected $observers = [
-        TanahKasDesa::class => [TanahKasDesaObserver::class],
-    ];
-
-    /**
-     * Register any events for your application.
-     */
+    
     public function boot(): void
     {
         //

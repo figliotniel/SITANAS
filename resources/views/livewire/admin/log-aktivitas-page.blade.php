@@ -1,76 +1,207 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+    
+    {{-- Header Section (Konsisten dengan Dashboard) --}}
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Log Aktivitas Sistem</h1>
-            <p class="text-sm text-slate-500 mt-1">Rekaman jejak digital seluruh aktivitas pengguna.</p>
+            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Audit Log Aktivitas</h1>
+            <p class="text-sm text-slate-500 mt-1">Rekam jejak digital perubahan data dan aktivitas pengguna.</p>
         </div>
-        <div class="bg-white border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-600 shadow-sm">
-            <i class="fas fa-clock mr-2 text-blue-500"></i> Server Time: {{ date('d M Y H:i') }}
+        <div class="inline-flex items-center px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-600 shadow-sm">
+            <i class="fas fa-clock mr-2 text-blue-500"></i>
+            <span class="font-mono">{{ date('d M Y H:i') }}</span>
         </div>
     </div>
 
-    <div class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
+    {{-- Filter Section (Style sama dengan Dashboard) --}}
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+        <div class="flex flex-col lg:flex-row gap-4">
+            
+            {{-- Search Input --}}
+            <div class="relative flex-1">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="fas fa-search text-slate-400"></i>
+                </div>
+                <input type="text" 
+                       wire:model.live.debounce.300ms="search" 
+                       class="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-shadow" 
+                       placeholder="Cari nama user atau deskripsi aktivitas...">
+            </div>
+
+            {{-- Filter Group --}}
+            <div class="flex flex-col sm:flex-row gap-2 lg:w-auto">
+                {{-- Filter Aksi --}}
+                <div class="sm:w-40">
+                    <select wire:model.live="filterAksi" class="block w-full py-2 pl-3 pr-8 border border-slate-300 bg-white rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        <option value="">Semua Aksi</option>
+                        <option value="TAMBAH">TAMBAH</option>
+                        <option value="EDIT">EDIT</option>
+                        <option value="VALIDASI">VALIDASI</option>
+                        <option value="ARSIP">ARSIP</option>
+                        <option value="HAPUS PERMANEN">HAPUS PERMANEN</option>
+                    </select>
+                </div>
+
+                {{-- Filter Tanggal (Mulai - Selesai) --}}
+                <div class="flex gap-2">
+                    <input type="date" wire:model.live="dateStart" class="block w-full sm:w-auto py-2 px-3 border border-slate-300 bg-white rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-slate-600">
+                    <span class="self-center text-slate-400 hidden sm:block">-</span>
+                    <input type="date" wire:model.live="dateEnd" class="block w-full sm:w-auto py-2 px-3 border border-slate-300 bg-white rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-slate-600">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Tabel Log --}}
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm text-slate-600">
-                <thead class="bg-slate-50 text-xs uppercase font-bold text-slate-500 border-b border-slate-200">
+            <table class="min-w-full divide-y divide-slate-200">
+                <thead class="bg-slate-50">
                     <tr>
-                        <th class="px-6 py-4">Waktu & Tanggal</th>
-                        <th class="px-6 py-4">Pengguna</th>
-                        <th class="px-6 py-4 text-center">Jenis Aksi</th>
-                        <th class="px-6 py-4">Deskripsi Detail</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Waktu</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">User</th>
+                        <th scope="col" class="px-6 py-3 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider">Aksi</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Deskripsi</th>
+                        <th scope="col" class="px-6 py-3 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider">Detail</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100">
+                <tbody class="bg-white divide-y divide-slate-200">
                     @forelse($logs as $log)
-                        <tr class="hover:bg-slate-50 transition duration-150">
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="p-2 rounded-full bg-slate-100 text-slate-500 mr-3">
-                                        <i class="far fa-calendar-alt"></i>
+                        {{-- Menggunakan tbody terpisah untuk setiap item agar row detail bisa bekerja dengan baik --}}
+                        <tbody x-data="{ expanded: false }" class="group border-b border-slate-100 last:border-b-0">
+                            {{-- Baris Utama --}}
+                            <tr class="hover:bg-slate-50 transition-colors cursor-pointer" @click="expanded = !expanded">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-bold text-slate-700">{{ $log->created_at->format('d M Y') }}</div>
+                                    <div class="text-xs font-mono text-slate-500">{{ $log->created_at->format('H:i:s') }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center text-xs font-bold mr-3 shadow-sm">
+                                            {{ substr($log->user->nama_lengkap ?? '?', 0, 1) }}
+                                        </div>
+                                        <div>
+                                            <div class="text-sm font-medium text-slate-900">{{ $log->user->nama_lengkap ?? 'Sistem / Tamu' }}</div>
+                                            <div class="text-xs text-slate-500">{{ $log->user->role->nama_role ?? '-' }}</div>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p class="text-sm font-bold text-slate-700">{{ date('d M Y', strtotime($log->timestamp)) }}</p>
-                                        <p class="text-xs text-slate-400 font-mono">{{ date('H:i:s', strtotime($log->timestamp)) }}</p>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    @php
+                                        $badgeColor = match($log->aksi) {
+                                            'TAMBAH'         => 'bg-emerald-100 text-emerald-700 border-emerald-200',
+                                            'EDIT'           => 'bg-blue-100 text-blue-700 border-blue-200',
+                                            'VALIDASI'       => 'bg-purple-100 text-purple-700 border-purple-200',
+                                            'ARSIP'          => 'bg-amber-100 text-amber-700 border-amber-200',
+                                            'HAPUS PERMANEN' => 'bg-red-100 text-red-700 border-red-200',
+                                            'PULIHKAN'       => 'bg-cyan-100 text-cyan-700 border-cyan-200',
+                                            default          => 'bg-slate-100 text-slate-600 border-slate-200',
+                                        };
+                                    @endphp
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border {{ $badgeColor }}">
+                                        {{ $log->aksi }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-slate-600 max-w-md truncate">
+                                    {{ $log->deskripsi }}
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <button class="p-1 text-slate-400 hover:text-blue-600 transition-transform duration-200" :class="expanded ? 'rotate-180 text-blue-600' : ''">
+                                        <i class="fas fa-chevron-down"></i>
+                                    </button>
+                                </td>
+                            </tr>
+
+                            {{-- Baris Detail (Before vs After) --}}
+                            <tr x-show="expanded" x-collapse style="display: none;">
+                                <td colspan="5" class="bg-slate-50 px-6 py-4 border-t border-slate-100">
+                                    <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+                                        <h4 class="text-xs font-bold text-slate-400 uppercase mb-4 flex items-center gap-2">
+                                            <i class="fas fa-exchange-alt"></i> Rincian Perubahan Data
+                                        </h4>
+
+                                        @if(!empty($log->properties) && (isset($log->properties['old']) || isset($log->properties['attributes'])))
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
+                                                
+                                                {{-- Data Lama (SEBELUM) --}}
+                                                @if(isset($log->properties['old']))
+                                                <div>
+                                                    <span class="inline-block px-2 py-1 rounded-md bg-red-50 text-red-600 text-xs font-bold mb-3 border border-red-100">
+                                                        SEBELUM
+                                                    </span>
+                                                    <ul class="space-y-2">
+                                                        @foreach($log->properties['old'] as $key => $val)
+                                                            <li class="flex flex-col sm:flex-row justify-between border-b border-slate-100 pb-1">
+                                                                <span class="text-slate-500 capitalize font-medium">{{ str_replace('_', ' ', $key) }}</span>
+                                                                <span class="font-mono text-slate-600 text-right break-all">{{ is_array($val) ? json_encode($val) : $val }}</span>
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                                @endif
+
+                                                {{-- Data Baru (SESUDAH) --}}
+                                                @if(isset($log->properties['new']))
+                                                <div>
+                                                    <span class="inline-block px-2 py-1 rounded-md bg-emerald-50 text-emerald-600 text-xs font-bold mb-3 border border-emerald-100">
+                                                        SESUDAH
+                                                    </span>
+                                                    <ul class="space-y-2">
+                                                        @foreach($log->properties['new'] as $key => $val)
+                                                            <li class="flex flex-col sm:flex-row justify-between border-b border-slate-100 pb-1">
+                                                                <span class="text-slate-500 capitalize font-medium">{{ str_replace('_', ' ', $key) }}</span>
+                                                                <span class="font-mono text-slate-900 font-bold text-right break-all">{{ is_array($val) ? json_encode($val) : $val }}</span>
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                                @endif
+
+                                                {{-- Kasus Tambah Data (Full New) --}}
+                                                @if(isset($log->properties['attributes']))
+                                                <div class="col-span-2">
+                                                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                                        @foreach($log->properties['attributes'] as $key => $val)
+                                                            @if(!in_array($key, ['created_at', 'updated_at', 'deleted_at', 'id']))
+                                                            <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                                                <div class="text-[10px] text-slate-400 uppercase font-bold mb-1">{{ str_replace('_', ' ', $key) }}</div>
+                                                                <div class="text-sm font-medium text-slate-800 truncate" title="{{ $val }}">{{ $val }}</div>
+                                                            </div>
+                                                            @endif
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                                @endif
+                                            </div>
+                                        @else
+                                            <div class="text-center py-4">
+                                                <p class="text-slate-400 italic text-sm">
+                                                    Tidak ada rincian data teknis yang terekam untuk aktivitas ini.
+                                                </p>
+                                            </div>
+                                        @endif
+
+                                        {{-- Metadata Tambahan (IP & Browser) --}}
+                                        <div class="mt-6 pt-4 border-t border-slate-100 flex flex-wrap gap-4 text-xs text-slate-400">
+                                            <div class="flex items-center gap-2">
+                                                <i class="fas fa-globe"></i> IP: {{ $log->ip_address ?? 'Unknown' }}
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <i class="fas fa-desktop"></i> Browser: {{ Str::limit($log->user_agent, 60) ?? 'Unknown' }}
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <div class="flex items-center">
-                                    <div class="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center text-xs font-bold mr-3 shadow-sm">
-                                        {{ substr($log->user->nama_lengkap ?? '?', 0, 1) }}
-                                    </div>
-                                    <div>
-                                        <p class="font-bold text-slate-900">{{ $log->user->nama_lengkap ?? 'User Terhapus' }}</p>
-                                        <p class="text-xs text-slate-500">{{ $log->user->role->nama_role ?? '-' }}</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 text-center">
-                                @php
-                                    $badgeColor = match($log->aksi) {
-                                        'HAPUS PERMANEN' => 'bg-red-100 text-red-700 border-red-200',
-                                        'HAPUS (ARSIP)'  => 'bg-orange-100 text-orange-700 border-orange-200',
-                                        'VALIDASI'       => 'bg-emerald-100 text-emerald-700 border-emerald-200',
-                                        'TAMBAH'         => 'bg-blue-100 text-blue-700 border-blue-200',
-                                        'UPDATE'         => 'bg-amber-100 text-amber-700 border-amber-200',
-                                        default          => 'bg-slate-100 text-slate-600 border-slate-200',
-                                    };
-                                @endphp
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold border {{ $badgeColor }}">
-                                    {{ $log->aksi }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4">
-                                <p class="text-slate-700 leading-relaxed">{{ $log->deskripsi }}</p>
-                            </td>
-                        </tr>
+                                </td>
+                            </tr>
+                        </tbody>
                     @empty
-                        <tr>
-                            <td colspan="4" class="px-6 py-12 text-center text-slate-400">
-                                <i class="fas fa-history text-4xl mb-3 opacity-30"></i>
-                                <p>Belum ada aktivitas yang tercatat.</p>
-                            </td>
-                        </tr>
+                        <tbody>
+                            <tr>
+                                <td colspan="5" class="px-6 py-12 text-center text-slate-500">
+                                    <i class="fas fa-clipboard-list text-4xl text-slate-300 mb-3 block"></i>
+                                    <p>Belum ada data aktivitas yang sesuai dengan filter.</p>
+                                </td>
+                            </tr>
+                        </tbody>
                     @endforelse
                 </tbody>
             </table>

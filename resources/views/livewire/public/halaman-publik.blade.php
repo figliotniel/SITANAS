@@ -23,7 +23,7 @@
                             </a>
                         @else
                             <a href="{{ route('login') }}" class="hidden sm:block px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition ml-2 whitespace-nowrap">
-                                Login Admin
+                                Login Aparatur Desa
                             </a>
                         @endauth
                     </div>

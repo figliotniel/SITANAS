@@ -10,11 +10,30 @@ class LogAktivitas extends Model
     use HasFactory;
 
     protected $table = 'log_aktivitas';
-    protected $fillable = ['user_id', 'aksi', 'deskripsi', 'timestamp'];
-    public $timestamps = false;
+
+    protected $fillable = [
+        'user_id',
+        'aksi',
+        'deskripsi',
+        'subject_type',
+        'subject_id',
+        'properties',
+        'ip_address',
+        'user_agent',
+        'timestamp',
+    ];
+
+    protected $casts = [
+        'properties' => 'collection',
+    ];
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class);
+    }
+
+    public function subject()
+    {
+        return $this->morphTo();
     }
 }

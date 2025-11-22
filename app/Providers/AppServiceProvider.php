@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\Models\TanahKasDesa;
+use App\Observers\TanahKasDesaObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +21,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Daftarkan Observer di sini agar pasti terbaca
+        TanahKasDesa::observe(TanahKasDesaObserver::class);
     }
 }

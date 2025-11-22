@@ -1,207 +1,226 @@
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    
+    {{-- Header --}}
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">{{ $pageTitle }}</h1>
-            <p class="text-base text-slate-500 mt-2">Silakan isi detail aset tanah dengan data yang valid dan lengkap.</p>
+            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">
+                {{ isset($aset) ? 'Edit Data Aset Tanah' : 'Input Data Aset Tanah' }}
+            </h1>
+            <p class="text-sm text-slate-500 mt-1">Formulir inventarisasi aset tanah desa sesuai standar Permendagri.</p>
         </div>
-        <a href="{{ route('dashboard') }}" wire:navigate class="group inline-flex items-center px-6 py-3 bg-white border-2 border-slate-200 rounded-xl text-base font-semibold text-slate-600 hover:border-blue-500 hover:text-blue-600 transition-all duration-200">
-            <i class="fas fa-arrow-left mr-3 group-hover:-translate-x-1 transition-transform"></i> Kembali
+        <a href="{{ route('dashboard') }}" wire:navigate class="inline-flex items-center px-4 py-2 bg-white border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-blue-600 transition shadow-sm">
+            <i class="fas fa-arrow-left mr-2 text-xs"></i> Kembali
         </a>
     </div>
 
-    <div class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
-        <div class="bg-slate-50 border-b border-slate-200 px-8 py-4">
-            <div class="flex items-center gap-3">
-                <div class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 text-white font-bold text-lg shadow-lg shadow-blue-500/30">1</div>
-                <span class="text-lg font-bold text-slate-700">Formulir Input Data (Wajib Diisi)</span>
-            </div>
-        </div>
-
-        <form wire:submit="save" class="p-8 md:p-10 space-y-10">
+    <form wire:submit.prevent="simpan">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
-            <div>
-                <h3 class="text-xl font-bold text-slate-900 mb-6 flex items-center border-b border-slate-100 pb-4">
-                    <i class="fas fa-file-alt text-blue-500 mr-3"></i> Informasi Utama
-                </h3>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="space-y-2">
-                        <label class="block text-base font-bold text-slate-700">Kode Barang</label>
-                        <input type="text" 
-                               wire:model="kode_barang" 
-                               class="block w-full px-5 py-4 rounded-2xl border-2 border-slate-200 text-lg text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200" 
-                               placeholder="Contoh: TNH-001-2025">
-                        @error('kode_barang') <p class="text-base text-red-600 font-medium mt-1 flex items-center"><i class="fas fa-exclamation-circle mr-2"></i>{{ $message }}</p> @enderror
+            {{-- KOLOM KIRI: DATA WAJIB (MANDATORY) --}}
+            <div class="lg:col-span-5 space-y-6">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="bg-blue-50 px-6 py-4 border-b border-blue-100 flex justify-between items-center">
+                        <h3 class="font-bold text-blue-900 flex items-center gap-2 text-sm uppercase tracking-wide">
+                            <i class="fas fa-star text-blue-600"></i> Data Wajib (Mandatory)
+                        </h3>
                     </div>
+                    
+                    {{-- Padding diperbesar (p-8) dan Spacing diperlonggar (space-y-7) --}}
+                    <div class="p-8 space-y-7">
+                        
+                        {{-- Kode Barang --}}
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Kode Barang <span class="text-red-500">*</span></label>
+                            <input type="text" wire:model="kode_barang" class="w-full rounded-lg border-slate-300 text-sm py-2.5 focus:ring-blue-500 focus:border-blue-500 placeholder-slate-400" placeholder="Contoh: 01.01.01.04.001">
+                            @error('kode_barang') <span class="text-xs text-red-500 mt-1 block"><i class="fas fa-exclamation-circle"></i> {{ $message }}</span> @enderror
+                        </div>
 
-                    <div class="space-y-2">
-                        <label class="block text-base font-bold text-slate-700">Asal Perolehan</label>
-                        <input type="text" 
-                               wire:model="asal_perolehan" 
-                               list="list-asal" 
-                               class="block w-full px-5 py-4 rounded-2xl border-2 border-slate-200 text-lg text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200" 
-                               placeholder="Pilih atau ketik manual...">
-                        <datalist id="list-asal">
-                            <option value="Aset Desa">
-                            <option value="Kekayaan Asli Desa">
-                            <option value="Bantuan Pemerintah Kabupaten">
-                            <option value="Hibah / Sumbangan">
-                            <option value="Pembelian APBDes">
-                        </datalist>
-                        @error('asal_perolehan') <p class="text-base text-red-600 font-medium mt-1 flex items-center"><i class="fas fa-exclamation-circle mr-2"></i>{{ $message }}</p> @enderror
-                    </div>
+                        {{-- Nama Barang --}}
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Nama / Jenis Barang <span class="text-red-500">*</span></label>
+                            <input type="text" wire:model="nama_barang" class="w-full rounded-lg border-slate-300 text-sm py-2.5 focus:ring-blue-500 focus:border-blue-500 placeholder-slate-400" placeholder="Contoh: Tanah Bangunan Kantor Desa">
+                            @error('nama_barang') <span class="text-xs text-red-500 mt-1 block"><i class="fas fa-exclamation-circle"></i> {{ $message }}</span> @enderror
+                        </div>
 
-                    <div class="space-y-2">
-                        <label class="block text-base font-bold text-slate-700">Luas Tanah (m²)</label>
-                        <div class="relative">
-                            <input type="number" 
-                                   step="0.01" 
-                                   wire:model="luas" 
-                                   class="block w-full px-5 py-4 rounded-2xl border-2 border-slate-200 text-lg text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200"
-                                   placeholder="0">
-                            <div class="absolute inset-y-0 right-0 pr-5 flex items-center pointer-events-none">
-                                <span class="text-lg font-bold text-slate-400">m²</span>
+                        {{-- Asal & Tanggal (Grid lebih renggang gap-6) --}}
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Asal Usul <span class="text-red-500">*</span></label>
+                                <input type="text" wire:model="asal_perolehan" list="list-asal" class="w-full rounded-lg border-slate-300 text-sm py-2.5 focus:ring-blue-500 focus:border-blue-500 placeholder-slate-400" placeholder="Pilih/Ketik...">
+                                <datalist id="list-asal">
+                                    <option value="Kekayaan Asli Desa"><option value="Perolehan Lainnya yang Sah"><option value="Hibah / Sumbangan"><option value="Pembelian APBDes">
+                                </datalist>
+                                @error('asal_perolehan') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Tgl Perolehan <span class="text-red-500">*</span></label>
+                                <input type="date" wire:model="tanggal_perolehan" class="w-full rounded-lg border-slate-300 text-sm py-2.5 focus:ring-blue-500 focus:border-blue-500">
+                                @error('tanggal_perolehan') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                             </div>
                         </div>
-                        @error('luas') <p class="text-base text-red-600 font-medium mt-1 flex items-center"><i class="fas fa-exclamation-circle mr-2"></i>{{ $message }}</p> @enderror
-                    </div>
 
-                    <div class="space-y-2">
-                        <label class="block text-base font-bold text-slate-700">Tanggal Perolehan</label>
-                        <input type="date" 
-                               wire:model="tanggal_perolehan" 
-                               class="block w-full px-5 py-4 rounded-2xl border-2 border-slate-200 text-lg text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200">
-                        @error('tanggal_perolehan') <p class="text-base text-red-600 font-medium mt-1 flex items-center"><i class="fas fa-exclamation-circle mr-2"></i>{{ $message }}</p> @enderror
-                    </div>
+                        {{-- Luas & Harga --}}
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Luas (m²) <span class="text-red-500">*</span></label>
+                                <input type="number" step="0.01" wire:model="luas" class="w-full rounded-lg border-slate-300 text-sm py-2.5 focus:ring-blue-500 focus:border-blue-500" placeholder="Contoh: 5000">
+                                @error('luas') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Harga (Rp) <span class="text-red-500">*</span></label>
+                                <input type="number" wire:model="harga_perolehan" class="w-full rounded-lg border-slate-300 text-sm py-2.5 focus:ring-blue-500 focus:border-blue-500" placeholder="Contoh: 150000000">
+                                @error('harga_perolehan') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
 
-                    <div class="md:col-span-2 space-y-2">
-                        <label class="block text-base font-bold text-slate-700">Lokasi / Alamat Lengkap</label>
-                        <textarea wire:model="lokasi" 
-                                  rows="3" 
-                                  class="block w-full px-5 py-4 rounded-2xl border-2 border-slate-200 text-lg text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200"
-                                  placeholder="Tuliskan alamat lengkap atau patokan lokasi..."></textarea>
-                        @error('lokasi') <p class="text-base text-red-600 font-medium mt-1 flex items-center"><i class="fas fa-exclamation-circle mr-2"></i>{{ $message }}</p> @enderror
+                        {{-- Kondisi --}}
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Kondisi Tanah <span class="text-red-500">*</span></label>
+                            <select wire:model="kondisi" class="w-full rounded-lg border-slate-300 text-sm py-2.5 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="Baik">Baik (Siap Pakai)</option>
+                                <option value="Rusak Ringan">Rusak Ringan (Perlu Urug/Landclearing)</option>
+                                <option value="Rusak Berat">Rusak Berat (Sengketa/Banjir)</option>
+                            </select>
+                            @error('kondisi') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                        </div>
+
+                        {{-- Penggunaan --}}
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Penggunaan Lahan <span class="text-red-500">*</span></label>
+                            <input type="text" wire:model="penggunaan" list="list-guna" class="w-full rounded-lg border-slate-300 text-sm py-2.5 focus:ring-blue-500 focus:border-blue-500 placeholder-slate-400" placeholder="Contoh: Lahan Pertanian Jagung">
+                            <datalist id="list-guna">
+                                <option value="Jalan Desa"><option value="Bangunan Kantor"><option value="Tanah Bengkok"><option value="Kuburan / Makam"><option value="Pasar Desa">
+                            </datalist>
+                            @error('penggunaan') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                        </div>
+
+                        {{-- Status Sertifikat --}}
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Status Hak <span class="text-red-500">*</span></label>
+                            <select wire:model="status_sertifikat" class="w-full rounded-lg border-slate-300 text-sm py-2.5 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="Sertifikat Hak Pakai">Sertifikat Hak Pakai (HP)</option>
+                                <option value="Sertifikat Hak Milik">Sertifikat Hak Milik (HM)</option>
+                                <option value="Sertifikat Hak Pengelolaan">Sertifikat Hak Pengelolaan (HPL)</option>
+                                <option value="Girik / Letter C">Girik / Letter C</option>
+                                <option value="Belum Bersertifikat">Belum Bersertifikat</option>
+                            </select>
+                        </div>
+
+                        {{-- Lokasi --}}
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Alamat / Lokasi <span class="text-red-500">*</span></label>
+                            <textarea wire:model="lokasi" rows="4" class="w-full rounded-lg border-slate-300 text-sm py-2.5 focus:ring-blue-500 focus:border-blue-500 placeholder-slate-400 leading-relaxed" placeholder="Contoh: Jl. Mawar No. 5, Dusun II, Sebelah utara Balai Desa"></textarea>
+                            @error('lokasi') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-slate-50 rounded-3xl p-8 border border-slate-200">
-                <h3 class="text-xl font-bold text-slate-900 mb-6 flex items-center border-b border-slate-200 pb-4">
-                    <i class="fas fa-certificate text-amber-500 mr-3"></i> Data Legalitas & Fisik
-                </h3>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="space-y-2">
-                        <label class="block text-base font-bold text-slate-700">NUP (Nomor Urut Pendaftaran)</label>
-                        <input type="text" wire:model="nup" class="block w-full px-5 py-4 rounded-2xl border-2 border-slate-200 text-lg text-slate-900 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10">
-                    </div>
-                    
-                    <div class="space-y-2">
-                        <label class="block text-base font-bold text-slate-700">Harga Perolehan</label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-                                <span class="text-lg font-bold text-slate-500">Rp</span>
-                            </div>
-                            <input type="number" wire:model="harga_perolehan" class="block w-full pl-14 pr-5 py-4 rounded-2xl border-2 border-slate-200 text-lg text-slate-900 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10">
+            {{-- KOLOM KANAN: PETA & OPSIONAL --}}
+            <div class="lg:col-span-7 space-y-6">
+                
+                {{-- Kartu Peta --}}
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="bg-slate-50 px-6 py-3 border-b border-slate-200 flex justify-between items-center">
+                        <h3 class="font-bold text-slate-800 text-sm uppercase flex items-center gap-2">
+                            <i class="fas fa-map-marked-alt text-amber-500"></i> Peta Lokasi
+                        </h3>
+                        <div class="flex items-center gap-2">
+                            <input type="text" wire:model="koordinat" readonly class="text-xs font-mono bg-white border border-slate-300 rounded px-2 py-1 w-48 text-slate-600 text-center" placeholder="Klik pada peta...">
                         </div>
                     </div>
-                    
-                    <div class="space-y-2">
-                        <label class="block text-base font-bold text-slate-700">Nomor Sertifikat</label>
-                        <input type="text" wire:model="nomor_sertifikat" class="block w-full px-5 py-4 rounded-2xl border-2 border-slate-200 text-lg text-slate-900 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10" placeholder="Nomor Hak Milik/Pakai">
+                    <div class="relative h-96 w-full bg-slate-100">
+                        <div wire:ignore id="map" class="w-full h-full z-0"></div>
+                        <div class="absolute bottom-3 left-3 bg-white/90 backdrop-blur px-3 py-2 rounded-lg shadow-sm z-[400] text-xs font-semibold text-slate-700 pointer-events-none border border-slate-200">
+                            <i class="fas fa-mouse-pointer mr-1 text-blue-500"></i> Klik peta untuk menandai lokasi aset
+                        </div>
                     </div>
-                    
-                    <div class="space-y-2">
-                        <label class="block text-base font-bold text-slate-700">Status Hak Tanah</label>
-                        <select wire:model="status_sertifikat" class="block w-full px-5 py-4 rounded-2xl border-2 border-slate-200 text-lg text-slate-900 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 h-16 bg-white">
-                            <option value="">-- Pilih Status --</option>
-                            <option value="Tanah Kas Desa">Tanah Kas Desa</option>
-                            <option value="Hak Milik">Hak Milik</option>
-                            <option value="Hak Pakai">Hak Pakai</option>
-                            <option value="Hak Guna Bangunan">Hak Guna Bangunan</option>
-                            <option value="Letter C">Letter C / Girik</option>
-                        </select>
-                    </div>
+                </div>
 
-                    <div class="md:col-span-2 space-y-2">
-                         <label class="block text-base font-bold text-slate-700">Penggunaan Lahan Saat Ini</label>
-                         <input type="text" wire:model="penggunaan" list="list-guna" class="block w-full px-5 py-4 rounded-2xl border-2 border-slate-200 text-lg text-slate-900 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10" placeholder="Misal: Sawah Produktif, Kantor Desa">
-                         <datalist id="list-guna">
-                             <option value="Pertanian / Sawah"><option value="Kebun / Tegalan"><option value="Kantor Desa"><option value="Lapangan Olahraga"><option value="Sekolah">
-                         </datalist>
+                {{-- Kartu Data Pelengkap --}}
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="bg-slate-50 px-6 py-3 border-b border-slate-200">
+                        <h3 class="font-bold text-slate-800 text-sm uppercase flex items-center gap-2">
+                            <i class="fas fa-list-ul text-slate-400"></i> Data Detail (Opsional)
+                        </h3>
                     </div>
-
-                    <div class="md:col-span-2 space-y-3">
-                        <label class="block text-base font-bold text-slate-700">Titik Koordinat</label>
-                        <div class="flex gap-3">
-                            <input type="text" wire:model="koordinat" readonly class="block w-full px-5 py-4 rounded-2xl border-2 border-slate-200 bg-slate-100 text-lg text-slate-600" placeholder="Klik lokasi di peta bawah...">
+                    <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nomor Sertifikat</label>
+                            <input type="text" wire:model="nomor_sertifikat" class="w-full rounded-lg border-slate-300 text-sm focus:ring-blue-500 focus:border-blue-500 placeholder-slate-400" placeholder="Contoh: 12.34.56.78.1.23456">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">NUP (No Register)</label>
+                            <input type="text" wire:model="nup" class="w-full rounded-lg border-slate-300 text-sm focus:ring-blue-500 focus:border-blue-500 placeholder-slate-400" placeholder="Contoh: 0001">
                         </div>
                         
-                        <div class="relative w-full h-96 rounded-3xl overflow-hidden border-4 border-white shadow-lg ring-1 ring-slate-200">
-                            <div wire:ignore id="map" class="w-full h-full z-0"></div>
-                            <div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur px-4 py-2 rounded-xl shadow-sm z-[400] text-sm font-semibold text-slate-700">
-                                <i class="fas fa-mouse-pointer mr-2 text-blue-500"></i> Klik peta untuk set lokasi
+                        {{-- Batas Wilayah --}}
+                        <div class="sm:col-span-2 pt-4 border-t border-slate-100">
+                            <label class="block text-xs font-bold text-slate-800 uppercase mb-3">Batas Wilayah Fisik</label>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase w-12">Utara</span>
+                                    <input type="text" wire:model="batas_utara" class="flex-1 rounded border-slate-300 text-sm py-1.5 placeholder-slate-300" placeholder="Sawah Bpk. Budi">
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase w-12">Timur</span>
+                                    <input type="text" wire:model="batas_timur" class="flex-1 rounded border-slate-300 text-sm py-1.5 placeholder-slate-300" placeholder="Jalan Raya">
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase w-12">Selatan</span>
+                                    <input type="text" wire:model="batas_selatan" class="flex-1 rounded border-slate-300 text-sm py-1.5 placeholder-slate-300" placeholder="Sungai">
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase w-12">Barat</span>
+                                    <input type="text" wire:model="batas_barat" class="flex-1 rounded border-slate-300 text-sm py-1.5 placeholder-slate-300" placeholder="Rumah Ibu Ani">
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-white rounded-2xl border-2 border-slate-200 border-dashed">
-                        <h4 class="md:col-span-2 text-lg font-bold text-slate-700 flex items-center"><i class="fas fa-compass text-slate-400 mr-2"></i> Batas-Batas Wilayah</h4>
-                        <div class="space-y-1">
-                            <label class="text-sm font-bold text-slate-500 uppercase">Utara</label>
-                            <input type="text" wire:model="batas_utara" class="block w-full px-4 py-3 rounded-xl border-2 border-slate-200 text-base focus:border-blue-500">
-                        </div>
-                        <div class="space-y-1">
-                            <label class="text-sm font-bold text-slate-500 uppercase">Timur</label>
-                            <input type="text" wire:model="batas_timur" class="block w-full px-4 py-3 rounded-xl border-2 border-slate-200 text-base focus:border-blue-500">
-                        </div>
-                        <div class="space-y-1">
-                            <label class="text-sm font-bold text-slate-500 uppercase">Selatan</label>
-                            <input type="text" wire:model="batas_selatan" class="block w-full px-4 py-3 rounded-xl border-2 border-slate-200 text-base focus:border-blue-500">
-                        </div>
-                        <div class="space-y-1">
-                            <label class="text-sm font-bold text-slate-500 uppercase">Barat</label>
-                            <input type="text" wire:model="batas_barat" class="block w-full px-4 py-3 rounded-xl border-2 border-slate-200 text-base focus:border-blue-500">
+                        {{-- Keterangan Tambahan --}}
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Keterangan Lain</label>
+                            <textarea wire:model="keterangan" rows="2" class="w-full rounded-lg border-slate-300 text-sm focus:ring-blue-500 focus:border-blue-500 placeholder-slate-400" placeholder="Contoh: Tanah datar, patok batas jelas"></textarea>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="flex flex-col-reverse md:flex-row justify-end items-center gap-4 pt-8 border-t border-slate-100">
-                <a href="{{ route('dashboard') }}" class="w-full md:w-auto px-8 py-4 rounded-2xl border-2 border-slate-200 text-lg font-bold text-slate-600 hover:bg-slate-50 hover:text-slate-800 transition text-center">
-                    Batal
-                </a>
-                <button type="submit" class="w-full md:w-auto inline-flex justify-center items-center px-10 py-4 bg-blue-600 border border-transparent rounded-2xl text-lg font-bold text-white hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-500/50 shadow-xl shadow-blue-500/30 transition-all transform hover:-translate-y-1 active:translate-y-0">
-                    <i class="fas fa-save mr-3"></i> {{ $saveButtonText }}
-                </button>
+                {{-- Tombol Aksi --}}
+                <div class="flex items-center justify-end gap-3 pt-4">
+                    <a href="{{ route('dashboard') }}" class="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-100 transition border border-transparent">
+                        Batalkan
+                    </a>
+                    <button type="submit" wire:loading.attr="disabled" class="px-6 py-2.5 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition disabled:opacity-50 flex items-center gap-2 transform hover:-translate-y-0.5">
+                        <span wire:loading.remove><i class="fas fa-save mr-2"></i> Simpan Data Aset</span>
+                        <span wire:loading><i class="fas fa-circle-notch fa-spin mr-2"></i> Menyimpan...</span>
+                    </button>
+                </div>
+
             </div>
-        </form>
-    </div>
+        </div>
+    </form>
 </div>
 
 @script
 <script>
+    // Inisialisasi peta
     document.addEventListener('livewire:navigated', () => {
-        // Hapus map lama jika ada agar tidak duplicate
-        if (window.sitanasMap) {
-            window.sitanasMap.remove();
-            window.sitanasMap = null;
-        }
+        if (window.sitanasMap) { window.sitanasMap.remove(); window.sitanasMap = null; }
 
-        // Inisialisasi Peta Baru
-        window.sitanasMap = L.map('map').setView([-7.7956, 110.3695], 13);
+        const defaultLat = -7.7956;
+        const defaultLng = 110.3695;
+        window.sitanasMap = L.map('map').setView([defaultLat, defaultLng], 13);
         
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors',
+            attribution: '&copy; OpenStreetMap',
             maxZoom: 19
         }).addTo(window.sitanasMap);
 
         var marker;
+        const savedCoord = @this.get('koordinat');
         
-        // Cek data eksisting
-        const currentKoordinat = @this.get('koordinat');
-        if (currentKoordinat) {
-            const parts = currentKoordinat.split(',');
+        if (savedCoord) {
+            const parts = savedCoord.split(',');
             const lat = parseFloat(parts[0]);
             const lng = parseFloat(parts[1]);
             if (!isNaN(lat) && !isNaN(lng)) {
@@ -211,21 +230,23 @@
             }
         }
 
-        // Event Klik
         window.sitanasMap.on('click', function(e) {
             const lat = e.latlng.lat.toFixed(6);
             const lng = e.latlng.lng.toFixed(6);
-            
-            // Update ke Livewire
             @this.set('koordinat', `${lat},${lng}`);
-
-            // Pindahkan Marker
             if (!marker) {
                 marker = L.marker(e.latlng).addTo(window.sitanasMap);
             } else {
                 marker.setLatLng(e.latlng);
             }
         });
+    });
+    
+    // Fallback
+    Livewire.hook('morph.updated', () => {
+        if(!document.getElementById('map')._leaflet_id) {
+            document.dispatchEvent(new Event('livewire:navigated'));
+        }
     });
 </script>
 @endscript

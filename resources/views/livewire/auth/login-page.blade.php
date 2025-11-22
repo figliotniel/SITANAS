@@ -3,17 +3,17 @@
     <style>
         /* 1. SETUP FULL SCREEN (BREAKOUT) */
         .login-container {
-            position: fixed;       /* Kunci: Memaksa keluar dari container parent */
+            position: fixed;
             top: 0; 
             left: 0;
-            width: 100vw;          /* Lebar penuh viewport */
-            height: 100vh;         /* Tinggi penuh viewport */
-            z-index: 9999;         /* Pastikan di atas elemen lain */
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
             display: flex;
             align-items: center;
             justify-content: center;
             font-family: 'Inter', sans-serif;
-            overflow: hidden;      /* Hilangkan scrollbar */
+            overflow: hidden;
             
             /* Background Image Berkualitas Tinggi */
             background-image: url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1932&auto=format&fit=crop');
@@ -26,8 +26,8 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: rgba(15, 23, 42, 0.5); /* Warna Navy Gelap Transparan */
-            backdrop-filter: blur(8px);        /* Efek Blur Kaca Buram */
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(8px);
             z-index: -1;
         }
 
@@ -36,15 +36,15 @@
             position: relative;
             width: 90%;
             max-width: 420px;
-            background: rgba(255, 255, 255, 0.85); /* Putih Susu Transparan */
-            backdrop-filter: blur(20px);           /* Blur Konsentrat di belakang kartu */
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.6);
             border-radius: 24px;
             padding: 3rem;
             box-shadow: 
-                0 25px 50px -12px rgba(0, 0, 0, 0.5), /* Bayangan Bawah Besar */
-                0 0 0 1px rgba(255, 255, 255, 0.2) inset; /* Border Cahaya Dalam */
+                0 25px 50px -12px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(255, 255, 255, 0.2) inset;
             
             /* ANIMASI MASUK: Muncul dari bawah */
             animation: slideUpFade 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
@@ -118,7 +118,7 @@
 
         .modern-input {
             width: 100%;
-            padding: 0.9rem 1rem 0.9rem 2.8rem; /* Padding kiri untuk ikon */
+            padding: 0.6rem 1rem 0.7rem 2.8rem;
             background: #f8fafc;
             border: 2px solid #e2e8f0;
             border-radius: 12px;
@@ -129,7 +129,7 @@
 
         .input-icon {
             position: absolute;
-            left: 14px;
+            left: 18px;
             top: 42px; /* Sesuaikan dengan posisi label */
             color: #94a3b8;
             transition: color 0.3s;
