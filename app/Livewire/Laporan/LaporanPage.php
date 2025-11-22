@@ -13,19 +13,22 @@ class LaporanPage extends Component
 {
     use WithPagination;
 
-    // Filter
+    // Filter properties
     public $searchTerm = '';
-    public $filterStatus = '';  // Bisa: 'Diproses', 'Disetujui', 'Ditolak', atau '' (Semua)
-    public $filterKondisi = ''; // Bisa: 'Baik', 'Rusak Berat', dll
+    public $filterStatus = '';
+    public $filterKondisi = '';
+    public $dateStart;
+    public $dateEnd;
 
-    // Reset halaman ke 1 jika filter berubah (UX Standard)
+    // Reset pagination saat filter berubah
     public function updatingSearchTerm() { $this->resetPage(); }
     public function updatingFilterStatus() { $this->resetPage(); }
     public function updatingFilterKondisi() { $this->resetPage(); }
+    public function updatingDateStart() { $this->resetPage(); } // Tambahan agar reset saat tanggal berubah
+    public function updatingDateEnd() { $this->resetPage(); }
 
     /**
-     * [OPTIMASI] Fungsi Pusat Query
-     * Dipakai oleh render() dan exportPdf() agar hasil konsisten
+     * Query Builder Pusat
      */
     private function buildQuery()
     {
@@ -33,6 +36,7 @@ class LaporanPage extends Component
             ->when($this->searchTerm, function($q) {
                 $q->where(function($sub) {
                     $sub->where('kode_barang', 'like', '%'.$this->searchTerm.'%')
+                        ->orWhere('nama_barang', 'like', '%'.$this->searchTerm.'%') // Tambah pencarian nama barang
                         ->orWhere('lokasi', 'like', '%'.$this->searchTerm.'%')
                         ->orWhere('asal_perolehan', 'like', '%'.$this->searchTerm.'%');
                 });
@@ -43,48 +47,109 @@ class LaporanPage extends Component
             ->when($this->filterKondisi, function($q) {
                 $q->where('kondisi', $this->filterKondisi);
             })
-            ->orderBy('created_at', 'desc'); // Urutkan dari yang terbaru
+            ->when($this->dateStart, function($q) {
+                $q->whereDate('created_at', '>=', $this->dateStart);
+            })
+            ->when($this->dateEnd, function($q) {
+                $q->whereDate('created_at', '<=', $this->dateEnd);
+            })
+            ->orderBy('created_at', 'desc');
     }
 
-    // PERBAIKAN: Nama fungsi diubah dari 'downloadPdf' menjadi 'exportPdf'
-    // agar sesuai dengan panggilan wire:click="exportPdf" di Blade
     public function exportPdf()
     {
-        // 1. Ambil data menggunakan Query yang sama dengan tabel (Tanpa Paginasi)
         $dataAset = $this->buildQuery()->get();
 
-        // 2. Cek jika data kosong
         if ($dataAset->isEmpty()) {
-            // Menggunakan dispatch event browser agar notifikasi lebih interaktif (opsional)
-            // atau flash message standar
             session()->flash('error', 'Tidak ada data yang sesuai filter untuk diunduh.');
             return;
         }
 
-        // 3. Load View PDF
-        // Pastikan view 'pdf.laporan-aset' benar-benar ada di resources/views/pdf/
         $pdf = Pdf::loadView('pdf.laporan-aset', ['dataAset' => $dataAset]);
         $pdf->setPaper('a4', 'landscape');
 
-        // 4. Buat nama file dinamis sesuai filter
-        $statusLabel = $this->filterStatus ? $this->filterStatus : 'Semua-Status';
-        $fileName = 'Laporan-Aset-' . $statusLabel . '-' . date('d-m-Y') . '.pdf';
+        $fileName = 'Laporan-Aset-' . date('d-m-Y-His') . '.pdf';
 
-        // 5. Return stream download
         return response()->streamDownload(function () use ($pdf) {
-            // Gunakan output() bukan stream() di dalam streamDownload 
-            // untuk menghindari konflik header HTTP
             echo $pdf->output();
         }, $fileName);
     }
 
+    // --- FUNGSI BARU: EXPORT CSV ---
+    public function exportCsv()
+    {
+        $dataAset = $this->buildQuery()->get();
+
+        if ($dataAset->isEmpty()) {
+            session()->flash('error', 'Tidak ada data untuk di-export ke CSV.');
+            return;
+        }
+
+        $fileName = 'Data-Aset-Sitanas-' . date('d-m-Y-His') . '.csv';
+
+        // Header kolom untuk file CSV
+        $columns = [
+            'Kode Barang',
+            'Nama Barang',
+            'NUP',
+            'Asal Perolehan',
+            'Luas (m2)',
+            'Harga Perolehan (Rp)',
+            'Lokasi',
+            'Kondisi',
+            'Status Sertifikat',
+            'Nomor Sertifikat',
+            'Penggunaan',
+            'Status Validasi',
+            'Tanggal Input'
+        ];
+
+        // Callback stream agar tidak membebani memori server
+        $callback = function() use($dataAset, $columns) {
+            $file = fopen('php://output', 'w');
+            
+            // Tambahkan BOM agar Excel bisa baca karakter UTF-8 dengan benar
+            fputs($file, "\xEF\xBB\xBF"); 
+            
+            // Tulis Header
+            fputcsv($file, $columns);
+
+            // Tulis Data Baris per Baris
+            foreach ($dataAset as $aset) {
+                fputcsv($file, [
+                    $aset->kode_barang,
+                    $aset->nama_barang ?? '-', // Pastikan kolom ini ada di DB
+                    $aset->nup,
+                    $aset->asal_perolehan,
+                    $aset->luas,            // Angka murni biar bisa dijumlah di Excel
+                    $aset->harga_perolehan, // Angka murni
+                    $aset->lokasi,
+                    $aset->kondisi,
+                    $aset->status_sertifikat,
+                    $aset->nomor_sertifikat,
+                    $aset->penggunaan,
+                    $aset->status_validasi,
+                    $aset->created_at->format('Y-m-d'),
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        // Return response stream CSV
+        return response()->stream($callback, 200, [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ]);
+    }
+
     public function render()
     {
-        // Gunakan Query yang sama, tapi pakai Paginasi untuk tampilan web
-        $aset = $this->buildQuery()->paginate(10);
-
         return view('livewire.laporan.laporan-page', [
-            'aset_tanah' => $aset,
+            'aset_tanah' => $this->buildQuery()->paginate(10),
             'total_aset' => $this->buildQuery()->count()
         ]);
     }
