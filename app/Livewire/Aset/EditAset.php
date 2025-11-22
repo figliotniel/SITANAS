@@ -10,19 +10,15 @@ use Illuminate\Support\Facades\Auth;
 #[Layout('layouts.app')]
 class EditAset extends Component
 {
-    public $pageTitle = 'Edit Aset Tanah';
-    public $saveButtonText = 'Simpan Perubahan';
-
     public TanahKasDesa $aset;
 
-    // Properti Form
     public $kode_barang;
     public $nama_barang;
     public $nup;
     public $asal_perolehan;
     public $tanggal_perolehan;
     public $harga_perolehan;
-    public $bukti_perolehan;
+    public $bukti_perolehan = 'Sertifikat';
     
     public $nomor_sertifikat;
     public $tanggal_sertifikat;
@@ -40,33 +36,10 @@ class EditAset extends Component
     public $batas_barat;
     public $keterangan;
 
-    protected function rules()
-    {
-        return [
-            'kode_barang'       => 'required|string|unique:tanah_kas_desa,kode_barang,' . $this->aset->id,
-            'nama_barang'       => 'required|string|max:255',
-            'asal_perolehan'    => 'required|string',
-            'tanggal_perolehan' => 'required|date',
-            'harga_perolehan'   => 'required|numeric|min:0',
-            'luas'              => 'required|numeric|min:1',
-            'lokasi'            => 'required|string|max:500',
-            'kondisi'           => 'required|in:Baik,Rusak Ringan,Rusak Berat',
-            'penggunaan'        => 'required|string',
-            'bukti_perolehan'   => 'required|string',
-        ];
-    }
-
-    protected $messages = [
-        'kode_barang.required' => 'Kode barang wajib diisi.',
-        'kode_barang.unique'   => 'Kode barang ini sudah digunakan oleh aset lain.',
-        'nama_barang.required' => 'Nama jenis barang wajib diisi.',
-    ];
-
     public function mount(TanahKasDesa $aset)
     {
         $this->aset = $aset;
 
-        // Isi form dengan data dari database
         $this->kode_barang      = $aset->kode_barang;
         $this->nama_barang      = $aset->nama_barang;
         $this->nup              = $aset->nup;
@@ -94,10 +67,20 @@ class EditAset extends Component
 
     public function simpan()
     {
-        // Validasi Input
-        $this->validate();
+        $this->validate([
+            'kode_barang'       => 'required|string|unique:tanah_kas_desa,kode_barang,' . $this->aset->id,
+            'nama_barang'       => 'required|string|max:255',
+            'asal_perolehan'    => 'required|string',
+            'tanggal_perolehan' => 'required|date',
+            'harga_perolehan'   => 'required|numeric|min:0',
+            'luas'              => 'required|numeric|min:1',
+            'lokasi'            => 'required|string|max:500',
+            'kondisi'           => 'required|in:Baik,Rusak Ringan,Rusak Berat',
+            'penggunaan'        => 'required|string',
+        ], [
+            'kode_barang.unique' => 'Kode barang sudah digunakan aset lain.',
+        ]);
 
-        // Update Data
         $this->aset->update([
             'kode_barang'        => $this->kode_barang,
             'nama_barang'        => $this->nama_barang,
