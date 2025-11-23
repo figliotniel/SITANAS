@@ -153,4 +153,4 @@ class LaporanPage extends Component
             'total_aset' => $this->buildQuery()->count()
         ]);
     }
-}
+};
