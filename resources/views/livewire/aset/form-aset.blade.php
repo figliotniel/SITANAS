@@ -4,7 +4,7 @@
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
             <h1 class="text-2xl font-bold text-slate-900 tracking-tight">
-                {{ isset($aset) ? 'Edit Data Aset Tanah' : 'Input Data Aset Tanah' }}
+                {{ isset($aset) ? 'Edit Data KIB A (Tanah)' : 'Input KIB A (Tanah)' }}
             </h1>
             <p class="text-sm text-slate-500 mt-1">Formulir inventarisasi aset tanah desa sesuai standar Permendagri.</p>
         </div>
@@ -25,9 +25,7 @@
                         </h3>
                     </div>
                     
-                    {{-- Padding diperbesar (p-8) dan Spacing diperlonggar (space-y-7) --}}
                     <div class="p-8 space-y-7">
-                        
                         {{-- Kode Barang --}}
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Kode Barang <span class="text-red-500">*</span></label>
@@ -42,7 +40,7 @@
                             @error('nama_barang') <span class="text-xs text-red-500 mt-1 block"><i class="fas fa-exclamation-circle"></i> {{ $message }}</span> @enderror
                         </div>
 
-                        {{-- Asal & Tanggal (Grid lebih renggang gap-6) --}}
+                        {{-- Asal & Tanggal --}}
                         <div class="grid grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Asal Usul <span class="text-red-500">*</span></label>
@@ -203,7 +201,6 @@
 
 @script
 <script>
-    // Inisialisasi peta
     document.addEventListener('livewire:navigated', () => {
         if (window.sitanasMap) { window.sitanasMap.remove(); window.sitanasMap = null; }
 
@@ -242,9 +239,10 @@
         });
     });
     
-    // Fallback
+    // FIX: Check if map element exists before accessing ID
     Livewire.hook('morph.updated', () => {
-        if(!document.getElementById('map')._leaflet_id) {
+        const mapEl = document.getElementById('map');
+        if(mapEl && !mapEl._leaflet_id) {
             document.dispatchEvent(new Event('livewire:navigated'));
         }
     });
