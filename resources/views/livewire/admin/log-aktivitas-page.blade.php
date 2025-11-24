@@ -42,11 +42,12 @@
                     </select>
                 </div>
 
-                {{-- Filter Tanggal --}}
-                <div class="flex gap-2 items-center">
-                    <input type="date" wire:model.live="dateStart" class="block w-full sm:w-auto py-2 px-3 border border-slate-300 bg-white rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-slate-600 cursor-pointer">
-                    <span class="text-slate-400 hidden sm:block">-</span>
-                    <input type="date" wire:model.live="dateEnd" class="block w-full sm:w-auto py-2 px-3 border border-slate-300 bg-white rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-slate-600 cursor-pointer">
+                {{-- Filter Tanggal (Tunggal) --}}
+                <div class="sm:w-40">
+                    <input type="date" 
+                           wire:model.live="filterDate" 
+                           class="block w-full py-2 px-3 border border-slate-300 bg-white rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm text-slate-600 cursor-pointer"
+                           placeholder="Pilih Tanggal">
                 </div>
             </div>
         </div>
@@ -66,10 +67,10 @@
                     </tr>
                 </thead>
                 
-                {{-- Loop Data --}}
+                {{-- Loop Data (Setiap item punya tbody sendiri agar border & expand valid) --}}
                 @forelse($logs as $log)
                     <tbody x-data="{ expanded: false }" class="bg-white border-b border-slate-100 last:border-b-0 hover:bg-slate-50 transition-colors">
-                        {{-- Baris Utama (Klik untuk Expand) --}}
+                        {{-- Baris Utama --}}
                         <tr class="cursor-pointer" @click="expanded = !expanded">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-bold text-slate-700">{{ $log->created_at->format('d M Y') }}</div>

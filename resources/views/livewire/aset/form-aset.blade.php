@@ -16,7 +16,6 @@
     <form wire:submit.prevent="simpan">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
-            {{-- KOLOM KIRI: DATA WAJIB (MANDATORY) --}}
             <div class="lg:col-span-5 space-y-6">
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                     <div class="bg-blue-50 px-6 py-4 border-b border-blue-100 flex justify-between items-center">
@@ -239,7 +238,6 @@
         });
     });
     
-    // FIX: Check if map element exists before accessing ID
     Livewire.hook('morph.updated', () => {
         const mapEl = document.getElementById('map');
         if(mapEl && !mapEl._leaflet_id) {
