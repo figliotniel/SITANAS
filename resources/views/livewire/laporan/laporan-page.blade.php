@@ -15,7 +15,7 @@
                 <span wire:loading wire:target="exportPdf">Memproses...</span>
             </button>
 
-            {{-- Tombol CSV (BARU) --}}
+            {{-- Tombol CSV --}}
             <button wire:click="exportCsv" wire:loading.attr="disabled" class="inline-flex items-center px-4 py-2.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xl text-sm font-bold hover:bg-emerald-100 hover:border-emerald-300 transition focus:ring-2 focus:ring-emerald-500/20 shadow-sm">
                 <i class="fas fa-file-csv mr-2 text-lg"></i>
                 <span wire:loading.remove wire:target="exportCsv">Export CSV</span>
@@ -24,7 +24,7 @@
         </div>
     </div>
 
-    {{-- Notifikasi Error jika data kosong --}}
+    {{-- Notifikasi Error --}}
     @if (session()->has('error'))
         <div class="bg-rose-100 border border-rose-400 text-rose-700 px-4 py-3 rounded-xl relative flex items-center gap-2 shadow-sm">
             <i class="fas fa-exclamation-circle text-xl"></i>
@@ -38,18 +38,21 @@
             <i class="fas fa-filter text-blue-500"></i> Filter Data
         </div>
         
+        {{-- Grid 4 Kolom yang Rapi --}}
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
             
+            {{-- 1. Pencarian --}}
             <div class="lg:col-span-1">
                 <label class="block text-xs font-bold text-slate-500 mb-1">Pencarian</label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <i class="fas fa-search text-slate-400"></i>
                     </div>
-                    <input type="text" wire:model.live.debounce.300ms="search" class="block w-full pl-10 rounded-xl border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2.5" placeholder="Cari nama/kode/lokasi...">
+                    <input type="text" wire:model.live.debounce.300ms="searchTerm" class="block w-full pl-10 rounded-xl border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2.5" placeholder="Cari nama/kode/lokasi...">
                 </div>
             </div>
 
+            {{-- 2. Status --}}
             <div>
                 <label class="block text-xs font-bold text-slate-500 mb-1">Status Validasi</label>
                 <select wire:model.live="filterStatus" class="block w-full rounded-xl border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2.5">
@@ -60,25 +63,21 @@
                 </select>
             </div>
 
+            {{-- 3. Kondisi --}}
             <div>
                 <label class="block text-xs font-bold text-slate-500 mb-1">Kondisi Fisik</label>
                 <select wire:model.live="filterKondisi" class="block w-full rounded-xl border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2.5">
                     <option value="">Semua Kondisi</option>
                     <option value="Baik">✨ Baik</option>
-                    <option value="Kurang Baik">⚠️ Kurang Baik</option>
+                    <option value="Rusak Ringan">⚠️ Rusak Ringan</option>
                     <option value="Rusak Berat">🛑 Rusak Berat</option>
                 </select>
             </div>
 
-            <div class="flex gap-2">
-                <div class="w-1/2">
-                    <label class="block text-xs font-bold text-slate-500 mb-1">Dari Tanggal</label>
-                    <input type="date" wire:model.live="dateStart" class="block w-full rounded-xl border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-xs py-2.5 text-slate-600">
-                </div>
-                <div class="w-1/2">
-                    <label class="block text-xs font-bold text-slate-500 mb-1">Sampai Tanggal</label>
-                    <input type="date" wire:model.live="dateEnd" class="block w-full rounded-xl border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-xs py-2.5 text-slate-600">
-                </div>
+            {{-- 4. Tanggal Tunggal (Fixed) --}}
+            <div>
+                <label class="block text-xs font-bold text-slate-500 mb-1">Tanggal Input</label>
+                <input type="date" wire:model.live="filterDate" class="block w-full rounded-xl border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2.5 text-slate-600">
             </div>
 
         </div>
