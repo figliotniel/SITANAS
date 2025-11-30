@@ -11,46 +11,33 @@ use Livewire\Attributes\Layout;
 class LogAktivitasPage extends Component
 {
     use WithPagination;
-
-    // Properti Filter
     public $search = '';
     public $filterAksi = '';
-    public $dateStart = '';
-    public $dateEnd = '';
-
-    // Reset pagination ke halaman 1 setiap kali filter berubah
+    public $filterDate = '';
     public function updatedSearch() { $this->resetPage(); }
     public function updatedFilterAksi() { $this->resetPage(); }
-    public function updatedDateStart() { $this->resetPage(); }
-    public function updatedDateEnd() { $this->resetPage(); }
+    public function updatedFilterDate() { $this->resetPage(); }
 
     public function render()
     {
-        $query = LogAktivitas::with(['user', 'subject']) // Load relasi agar performa cepat
-            ->latest(); // Urutkan dari yang terbaru
+        $query = LogAktivitas::with(['user.role', 'subject'])
+            ->latest();
 
-        // 1. Logika Pencarian (Search)
         if (!empty($this->search)) {
             $query->where(function($q) {
-                $q->where('deskripsi', 'like', '%' . $this->search . '%') // Cari di deskripsi
-                  ->orWhereHas('user', function($u) { // Cari di nama user
+                $q->where('deskripsi', 'like', '%' . $this->search . '%')
+                  ->orWhereHas('user', function($u) {
                       $u->where('nama_lengkap', 'like', '%' . $this->search . '%');
                   });
             });
         }
 
-        // 2. Filter Berdasarkan Jenis Aksi
         if (!empty($this->filterAksi)) {
             $query->where('aksi', $this->filterAksi);
         }
 
-        // 3. Filter Rentang Tanggal
-        if (!empty($this->dateStart)) {
-            $query->whereDate('created_at', '>=', $this->dateStart);
-        }
-        
-        if (!empty($this->dateEnd)) {
-            $query->whereDate('created_at', '<=', $this->dateEnd);
+        if (!empty($this->filterDate)) {
+            $query->whereDate('created_at', $this->filterDate);
         }
 
         return view('livewire.admin.log-aktivitas-page', [

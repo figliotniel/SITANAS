@@ -4,14 +4,12 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>Detail Aset - {{ $aset->kode_barang ?? 'Tanpa Kode' }}</title>
     <style>
-        /* Reset dasar untuk PDF */
         body { 
             font-family: sans-serif; 
             font-size: 10pt; 
             color: #333;
         }
         
-        /* Header */
         .header { 
             text-align: center; 
             margin-bottom: 25px; 
@@ -29,12 +27,11 @@
             font-weight: bold;
         }
 
-        /* Table Styles */
         table { 
             width: 100%; 
             border-collapse: collapse; 
             margin-bottom: 20px; 
-            page-break-inside: avoid; /* Mencegah tabel terpotong di tengah baris */
+            page-break-inside: avoid;
         }
         th, td { 
             border: 1px solid #444; 
@@ -46,13 +43,12 @@
             background-color: #e0e0e0; 
             font-size: 10pt; 
             font-weight: bold;
-            width: 25%; /* Lebar label konsisten */
+            width: 25%;
         }
         td {
             width: 25%;
         }
 
-        /* Section Title */
         h4 { 
             margin-top: 15px; 
             margin-bottom: 10px;
@@ -62,17 +58,14 @@
             color: #222;
         }
 
-        /* Status Badges (Disederhanakan untuk PDF karena background warna sering tidak tercetak defaultnya) */
         .status-validasi { 
             font-weight: bold; 
             text-transform: uppercase;
         }
-        /* Opsi warna teks agar aman dicetak */
         .status-diproses { color: #d39e00; }
         .status-disetujui { color: #28a745; }
         .status-ditolak { color: #dc3545; }
 
-        /* Helper */
         .text-right { text-align: right; }
         .colspan-3 { width: 75%; }
     </style>
@@ -156,7 +149,6 @@
         <tr>
             <th>Status Validasi</th>
             <td colspan="3">
-                {{-- Menggunakan class warna teks agar lebih aman saat diprint --}}
                 <span class="status-validasi status-{{ strtolower($aset->status_validasi) }}">
                     {{ $aset->status_validasi }}
                 </span>
@@ -165,7 +157,6 @@
         <tr>
             <th>Diinput Oleh</th>
             <td colspan="3">
-                {{-- MENGGUNAKAN NULL SAFE OPERATOR (?->) --}}
                 {{ $aset->diinput_oleh_user?->nama_lengkap ?? 'User Tidak Ditemukan' }}
             </td>
         </tr>
@@ -193,7 +184,6 @@
         </tr>
     </table>
     
-    {{-- Footer Waktu Cetak --}}
     <div style="margin-top: 30px; font-size: 8pt; text-align: right; color: #777;">
         <i>Dicetak pada: {{ date('d-m-Y H:i:s') }}</i>
     </div>

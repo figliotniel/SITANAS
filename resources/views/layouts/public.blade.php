@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SITANAS v2 - Transparansi Aset</title>
+    <title>SITANAS - Transparansi Aset</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,9 +24,7 @@
 <body class="h-full font-sans antialiased text-slate-900 selection:bg-blue-500 selection:text-white">
 
     <div class="min-h-screen flex flex-col">
-        @auth
-            <livewire:navigasi.top-bar />
-        @endauth
+
 
         {{-- Layout ini menggunakan w-full agar konten bisa full screen --}}
         <main class="flex-1 w-full">

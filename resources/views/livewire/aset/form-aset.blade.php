@@ -4,7 +4,7 @@
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
             <h1 class="text-2xl font-bold text-slate-900 tracking-tight">
-                {{ isset($aset) ? 'Edit Data KIB A (Tanah)' : 'Input KIB A (Tanah)' }}
+                {{ isset($aset) ? 'Edit Data Aset Tanah' : 'Input Aset Tanah' }}
             </h1>
             <p class="text-sm text-slate-500 mt-1">Formulir inventarisasi aset tanah desa sesuai standar Permendagri.</p>
         </div>

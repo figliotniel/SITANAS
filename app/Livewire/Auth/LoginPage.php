@@ -27,8 +27,7 @@ class LoginPage extends Component
             // 4. Regenerate session (keamanan)
             request()->session()->regenerate();
 
-            // 5. Redirect ke dashboard (nanti kita buat di Langkah 5)
-            return redirect()->intended('/'); // Redirect ke halaman utama
+            return redirect()->intended('/');
         
         }
 

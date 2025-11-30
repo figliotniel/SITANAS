@@ -20,11 +20,10 @@ class LogAktivitas extends Model
         'properties',
         'ip_address',
         'user_agent',
-        'timestamp',
     ];
 
     protected $casts = [
-        'properties' => 'collection',
+        'properties' => 'array', 
     ];
 
     public function user()

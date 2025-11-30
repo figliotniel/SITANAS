@@ -67,9 +67,9 @@
                     </tr>
                 </thead>
                 
-                {{-- Loop Data (Setiap item punya tbody sendiri agar border & expand valid) --}}
                 @forelse($logs as $log)
-                    <tbody x-data="{ expanded: false }" class="bg-white border-b border-slate-100 last:border-b-0 hover:bg-slate-50 transition-colors">
+                    {{-- FIXED: Ditambahkan wire:key untuk mencegah duplikasi render --}}
+                    <tbody wire:key="log-{{ $log->id }}" x-data="{ expanded: false }" class="bg-white border-b border-slate-100 last:border-b-0 hover:bg-slate-50 transition-colors">
                         {{-- Baris Utama --}}
                         <tr class="cursor-pointer" @click="expanded = !expanded">
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -123,17 +123,32 @@
                                         <i class="fas fa-exchange-alt"></i> Rincian Perubahan Data
                                     </h4>
 
-                                    @if(!empty($log->properties) && (isset($log->properties['old']) || isset($log->properties['attributes'])))
+                                    {{-- FIXED: Logic Penggabungan Data agar Tidak Muncul Double --}}
+                                    @php
+                                        $props = $log->properties ?? [];
+                                        
+                                        // Ambil data 'old'
+                                        $old = $props['old'] ?? [];
+                                        
+                                        // Ambil data 'new'. Jika kosong, ambil dari 'attributes'
+                                        $new = $props['new'] ?? ($props['attributes'] ?? []);
+                                        
+                                        // Bersihkan kolom sistem yang tidak perlu ditampilkan
+                                        $ignoredColumns = ['created_at', 'updated_at', 'deleted_at', 'id'];
+                                        $new = array_diff_key($new, array_flip($ignoredColumns));
+                                    @endphp
+
+                                    @if(!empty($old) || !empty($new))
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
                                             
                                             {{-- Data Lama (SEBELUM) --}}
-                                            @if(isset($log->properties['old']))
+                                            @if(!empty($old))
                                             <div>
                                                 <span class="inline-block px-2 py-1 rounded-md bg-red-50 text-red-600 text-[10px] font-bold mb-3 border border-red-100">
                                                     SEBELUM
                                                 </span>
                                                 <ul class="space-y-2">
-                                                    @foreach($log->properties['old'] as $key => $val)
+                                                    @foreach($old as $key => $val)
                                                         <li class="flex flex-col sm:flex-row justify-between border-b border-slate-50 pb-1 border-dashed">
                                                             <span class="text-slate-500 capitalize font-medium text-xs">{{ str_replace('_', ' ', $key) }}</span>
                                                             <span class="font-mono text-slate-600 text-right break-all text-xs">{{ is_array($val) ? json_encode($val) : $val }}</span>
@@ -144,13 +159,13 @@
                                             @endif
 
                                             {{-- Data Baru (SESUDAH) --}}
-                                            @if(isset($log->properties['new']))
+                                            @if(!empty($new))
                                             <div>
                                                 <span class="inline-block px-2 py-1 rounded-md bg-emerald-50 text-emerald-600 text-[10px] font-bold mb-3 border border-emerald-100">
                                                     SESUDAH
                                                 </span>
                                                 <ul class="space-y-2">
-                                                    @foreach($log->properties['new'] as $key => $val)
+                                                    @foreach($new as $key => $val)
                                                         <li class="flex flex-col sm:flex-row justify-between border-b border-slate-50 pb-1 border-dashed">
                                                             <span class="text-slate-500 capitalize font-medium text-xs">{{ str_replace('_', ' ', $key) }}</span>
                                                             <span class="font-mono text-slate-900 font-bold text-right break-all text-xs">{{ is_array($val) ? json_encode($val) : $val }}</span>
@@ -160,21 +175,6 @@
                                             </div>
                                             @endif
 
-                                            {{-- Kasus Tambah Data (Full New) --}}
-                                            @if(isset($log->properties['attributes']))
-                                            <div class="col-span-2">
-                                                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                                                    @foreach($log->properties['attributes'] as $key => $val)
-                                                        @if(!in_array($key, ['created_at', 'updated_at', 'deleted_at', 'id']))
-                                                        <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                                                            <div class="text-[10px] text-slate-400 uppercase font-bold mb-1">{{ str_replace('_', ' ', $key) }}</div>
-                                                            <div class="text-xs font-medium text-slate-800 truncate" title="{{ $val }}">{{ $val }}</div>
-                                                        </div>
-                                                        @endif
-                                                    @endforeach
-                                                </div>
-                                            </div>
-                                            @endif
                                         </div>
                                     @else
                                         <div class="text-center py-4">

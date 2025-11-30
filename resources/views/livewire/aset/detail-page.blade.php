@@ -1,4 +1,4 @@
-<div class="max-w-7xl mx-auto space-y-8 pb-20">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
     
     {{-- Notifikasi Sukses / Error --}}
     @if (session()->has('success'))

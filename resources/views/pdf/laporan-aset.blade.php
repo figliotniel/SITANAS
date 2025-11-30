@@ -6,7 +6,7 @@
     <style>
         body {
             font-family: sans-serif;
-            font-size: 9pt; /* Font lebih kecil agar muat tabel */
+            font-size: 9pt;
         }
         .header {
             text-align: center;
@@ -33,7 +33,6 @@
         .text-center { text-align: center; }
         .text-right { text-align: right; }
         
-        /* Status badge versi text untuk PDF */
         .badge { font-weight: bold; font-size: 8pt; }
         .status-disetujui { color: green; }
         .status-ditolak { color: red; }
@@ -101,13 +100,11 @@
         </tbody>
     </table>
 
-    {{-- Total Ringkasan --}}
     <div style="margin-top: 20px;">
         <strong>Total Aset: {{ $dataAset->count() }} Item</strong> <br>
         <strong>Total Nilai Aset: Rp{{ number_format($dataAset->sum('harga_perolehan'), 0, ',', '.') }}</strong>
     </div>
 
-    {{-- Kolom Tanda Tangan --}}
     <div class="footer-signature">
         <div class="signature-box">
             <p>Mengetahui,<br>Kepala Desa</p>
