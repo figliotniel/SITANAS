@@ -293,7 +293,6 @@
 
         <div class="divider">Atau akses sebagai tamu</div>
 
-        {{-- Tombol Publik --}}
         <a href="{{ route('publik') }}" wire:navigate class="btn-secondary">
             <i class="fas fa-globe-asia"></i> Lihat Data Publik
         </a>

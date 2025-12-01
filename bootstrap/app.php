@@ -11,7 +11,6 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // MENAMBAHKAN PENGECUALIAN CSRF DI SINI
         $middleware->validateCsrfTokens(except: [
             'tanah/*',      // Contoh: membolehkan semua URL yang diawali 'tanah/'
             'input-data',   // Contoh lain, sesuaikan dengan route kamu
