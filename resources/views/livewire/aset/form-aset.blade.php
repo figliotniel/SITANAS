@@ -4,7 +4,7 @@
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
             <h1 class="text-2xl font-bold text-slate-900 tracking-tight">
-                {{ isset($aset) ? 'Edit Data Aset Tanah' : 'Input Aset Tanah' }}
+                {{ isset($aset) ? 'Edit Data KIB A (Tanah)' : 'Input KIB A (Tanah)' }}
             </h1>
             <p class="text-sm text-slate-500 mt-1">Formulir inventarisasi aset tanah desa sesuai standar Permendagri.</p>
         </div>
@@ -16,6 +16,7 @@
     <form wire:submit.prevent="simpan">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
+            {{-- KOLOM KIRI: DATA WAJIB (MANDATORY) --}}
             <div class="lg:col-span-5 space-y-6">
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                     <div class="bg-blue-50 px-6 py-4 border-b border-blue-100 flex justify-between items-center">
@@ -25,17 +26,28 @@
                     </div>
                     
                     <div class="p-8 space-y-7">
-                        {{-- Kode Barang --}}
+                        
+                        {{-- Kode Barang (Boleh Angka & Titik) --}}
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Kode Barang <span class="text-red-500">*</span></label>
-                            <input type="text" wire:model="kode_barang" class="w-full rounded-lg border-slate-300 text-sm py-2.5 focus:ring-blue-500 focus:border-blue-500 placeholder-slate-400" placeholder="Contoh: 01.01.01.04.001">
+                            <input type="text" 
+                                   wire:model="kode_barang" 
+                                   class="w-full rounded-lg border-slate-300 text-sm py-2.5 focus:ring-blue-500 focus:border-blue-500 placeholder-slate-400" 
+                                   placeholder="Contoh: 01.01.01.04.001"
+                                   {{-- Hanya Angka dan Titik --}}
+                                   oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
                             @error('kode_barang') <span class="text-xs text-red-500 mt-1 block"><i class="fas fa-exclamation-circle"></i> {{ $message }}</span> @enderror
                         </div>
 
-                        {{-- Nama Barang --}}
+                        {{-- Nama Barang (Hanya Kata/Huruf) --}}
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Nama / Jenis Barang <span class="text-red-500">*</span></label>
-                            <input type="text" wire:model="nama_barang" class="w-full rounded-lg border-slate-300 text-sm py-2.5 focus:ring-blue-500 focus:border-blue-500 placeholder-slate-400" placeholder="Contoh: Tanah Bangunan Kantor Desa">
+                            <input type="text" 
+                                   wire:model="nama_barang" 
+                                   class="w-full rounded-lg border-slate-300 text-sm py-2.5 focus:ring-blue-500 focus:border-blue-500 placeholder-slate-400" 
+                                   placeholder="Contoh: Tanah Bangunan Kantor Desa"
+                                   {{-- Hanya Huruf dan Spasi --}}
+                                   oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')">
                             @error('nama_barang') <span class="text-xs text-red-500 mt-1 block"><i class="fas fa-exclamation-circle"></i> {{ $message }}</span> @enderror
                         </div>
 
@@ -43,7 +55,13 @@
                         <div class="grid grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Asal Usul <span class="text-red-500">*</span></label>
-                                <input type="text" wire:model="asal_perolehan" list="list-asal" class="w-full rounded-lg border-slate-300 text-sm py-2.5 focus:ring-blue-500 focus:border-blue-500 placeholder-slate-400" placeholder="Pilih/Ketik...">
+                                <input type="text" 
+                                       wire:model="asal_perolehan" 
+                                       list="list-asal" 
+                                       class="w-full rounded-lg border-slate-300 text-sm py-2.5 focus:ring-blue-500 focus:border-blue-500 placeholder-slate-400" 
+                                       placeholder="Pilih/Ketik..."
+                                       {{-- Hanya Huruf dan Spasi --}}
+                                       oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')">
                                 <datalist id="list-asal">
                                     <option value="Kekayaan Asli Desa"><option value="Perolehan Lainnya yang Sah"><option value="Hibah / Sumbangan"><option value="Pembelian APBDes">
                                 </datalist>
@@ -60,12 +78,23 @@
                         <div class="grid grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Luas (m²) <span class="text-red-500">*</span></label>
-                                <input type="number" step="0.01" wire:model="luas" class="w-full rounded-lg border-slate-300 text-sm py-2.5 focus:ring-blue-500 focus:border-blue-500" placeholder="Contoh: 5000">
+                                <input type="number" 
+                                       step="0.01" 
+                                       wire:model="luas" 
+                                       class="w-full rounded-lg border-slate-300 text-sm py-2.5 focus:ring-blue-500 focus:border-blue-500" 
+                                       placeholder="Contoh: 5000"
+                                       {{-- Hanya Angka dan Titik (Desimal) --}}
+                                       oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
                                 @error('luas') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Harga (Rp) <span class="text-red-500">*</span></label>
-                                <input type="number" wire:model="harga_perolehan" class="w-full rounded-lg border-slate-300 text-sm py-2.5 focus:ring-blue-500 focus:border-blue-500" placeholder="Contoh: 150000000">
+                                <input type="text" {{-- Ubah type jadi text agar regex jalan mulus, nanti dicasting backend --}}
+                                       wire:model="harga_perolehan" 
+                                       class="w-full rounded-lg border-slate-300 text-sm py-2.5 focus:ring-blue-500 focus:border-blue-500" 
+                                       placeholder="Contoh: 150000000"
+                                       {{-- Hanya Angka Murni --}}
+                                       oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                                 @error('harga_perolehan') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                             </div>
                         </div>
@@ -81,10 +110,16 @@
                             @error('kondisi') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                         </div>
 
-                        {{-- Penggunaan --}}
+                        {{-- Penggunaan (Hanya Kata) --}}
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Penggunaan Lahan <span class="text-red-500">*</span></label>
-                            <input type="text" wire:model="penggunaan" list="list-guna" class="w-full rounded-lg border-slate-300 text-sm py-2.5 focus:ring-blue-500 focus:border-blue-500 placeholder-slate-400" placeholder="Contoh: Lahan Pertanian Jagung">
+                            <input type="text" 
+                                   wire:model="penggunaan" 
+                                   list="list-guna" 
+                                   class="w-full rounded-lg border-slate-300 text-sm py-2.5 focus:ring-blue-500 focus:border-blue-500 placeholder-slate-400" 
+                                   placeholder="Contoh: Lahan Pertanian Jagung"
+                                   {{-- Hanya Huruf dan Spasi --}}
+                                   oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')">
                             <datalist id="list-guna">
                                 <option value="Jalan Desa"><option value="Bangunan Kantor"><option value="Tanah Bengkok"><option value="Kuburan / Makam"><option value="Pasar Desa">
                             </datalist>
@@ -103,7 +138,7 @@
                             </select>
                         </div>
 
-                        {{-- Lokasi --}}
+                        {{-- Lokasi (Alamat boleh angka & huruf) --}}
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Alamat / Lokasi <span class="text-red-500">*</span></label>
                             <textarea wire:model="lokasi" rows="4" class="w-full rounded-lg border-slate-300 text-sm py-2.5 focus:ring-blue-500 focus:border-blue-500 placeholder-slate-400 leading-relaxed" placeholder="Contoh: Jl. Mawar No. 5, Dusun II, Sebelah utara Balai Desa"></textarea>
@@ -142,13 +177,22 @@
                         </h3>
                     </div>
                     <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        
+                        {{-- Nomor Sertifikat (Boleh Campur) --}}
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nomor Sertifikat</label>
                             <input type="text" wire:model="nomor_sertifikat" class="w-full rounded-lg border-slate-300 text-sm focus:ring-blue-500 focus:border-blue-500 placeholder-slate-400" placeholder="Contoh: 12.34.56.78.1.23456">
                         </div>
+                        
+                        {{-- NUP (Hanya Angka) --}}
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase mb-1">NUP (No Register)</label>
-                            <input type="text" wire:model="nup" class="w-full rounded-lg border-slate-300 text-sm focus:ring-blue-500 focus:border-blue-500 placeholder-slate-400" placeholder="Contoh: 0001">
+                            <input type="text" 
+                                   wire:model="nup" 
+                                   class="w-full rounded-lg border-slate-300 text-sm focus:ring-blue-500 focus:border-blue-500 placeholder-slate-400" 
+                                   placeholder="Contoh: 0001"
+                                   {{-- Hanya Angka --}}
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                         </div>
                         
                         {{-- Batas Wilayah --}}
@@ -208,7 +252,7 @@
         window.sitanasMap = L.map('map').setView([defaultLat, defaultLng], 13);
         
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap',
+            attribution: '&copy; OpenStreetMap contributors',
             maxZoom: 19
         }).addTo(window.sitanasMap);
 
@@ -226,18 +270,47 @@
             }
         }
 
-        window.sitanasMap.on('click', function(e) {
+        window.sitanasMap.on('click', async function(e) {
             const lat = e.latlng.lat.toFixed(6);
             const lng = e.latlng.lng.toFixed(6);
+            
             @this.set('koordinat', `${lat},${lng}`);
+
             if (!marker) {
                 marker = L.marker(e.latlng).addTo(window.sitanasMap);
             } else {
                 marker.setLatLng(e.latlng);
             }
+
+            @this.set('lokasi', 'Sedang mengambil alamat dari peta...');
+            
+            try {
+                const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`;
+                
+                const response = await fetch(url, {
+                    headers: {
+                        'Accept-Language': 'id'
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Gagal mengambil alamat');
+
+                const data = await response.json();
+                
+                if (data && data.display_name) {
+                    @this.set('lokasi', data.display_name);
+                } else {
+                    @this.set('lokasi', '');
+                }
+
+            } catch (error) {
+                console.error('Error reverse geocoding:', error);
+                @this.set('lokasi', 'Gagal mengambil alamat otomatis. Silakan ketik manual.');
+            }
         });
     });
     
+    // Fallback inisialisasi map
     Livewire.hook('morph.updated', () => {
         const mapEl = document.getElementById('map');
         if(mapEl && !mapEl._leaflet_id) {

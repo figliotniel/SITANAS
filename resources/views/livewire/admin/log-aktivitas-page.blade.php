@@ -123,75 +123,76 @@
                                         <i class="fas fa-exchange-alt"></i> Rincian Perubahan Data
                                     </h4>
 
-                                    {{-- FIXED: Logic Penggabungan Data agar Tidak Muncul Double --}}
                                     @php
                                         $props = $log->properties ?? [];
-                                        
-                                        // Ambil data 'old'
                                         $old = $props['old'] ?? [];
+                                        $new = $props['new'] ?? []; // Hanya ambil 'new', JANGAN ambil 'attributes'
+                                        $attributes = $props['attributes'] ?? []; // Ambil 'attributes' terpisah
                                         
-                                        // Ambil data 'new'. Jika kosong, ambil dari 'attributes'
-                                        $new = $props['new'] ?? ($props['attributes'] ?? []);
-                                        
-                                        // Bersihkan kolom sistem yang tidak perlu ditampilkan
-                                        $ignoredColumns = ['created_at', 'updated_at', 'deleted_at', 'id'];
-                                        $new = array_diff_key($new, array_flip($ignoredColumns));
+                                        // Bersihkan kolom sistem
+                                        $ignored = ['created_at', 'updated_at', 'deleted_at', 'id'];
+                                        $new = array_diff_key($new, array_flip($ignored));
                                     @endphp
 
                                     @if(!empty($old) || !empty($new))
+                                        {{-- TAMPILAN UNTUK EDIT / UPDATE (Kiri-Kanan) --}}
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
-                                            
-                                            {{-- Data Lama (SEBELUM) --}}
                                             @if(!empty($old))
                                             <div>
-                                                <span class="inline-block px-2 py-1 rounded-md bg-red-50 text-red-600 text-[10px] font-bold mb-3 border border-red-100">
-                                                    SEBELUM
-                                                </span>
+                                                <span class="inline-block px-2 py-1 rounded-md bg-red-50 text-red-600 text-[10px] font-bold mb-3 border border-red-100">SEBELUM</span>
                                                 <ul class="space-y-2">
                                                     @foreach($old as $key => $val)
-                                                        <li class="flex flex-col sm:flex-row justify-between border-b border-slate-50 pb-1 border-dashed">
-                                                            <span class="text-slate-500 capitalize font-medium text-xs">{{ str_replace('_', ' ', $key) }}</span>
-                                                            <span class="font-mono text-slate-600 text-right break-all text-xs">{{ is_array($val) ? json_encode($val) : $val }}</span>
+                                                        <li class="flex justify-between border-b border-slate-50 pb-1 border-dashed">
+                                                            <span class="text-slate-500 capitalize text-xs">{{ str_replace('_', ' ', $key) }}</span>
+                                                            <span class="font-mono text-slate-600 text-right text-xs">{{ is_array($val) ? json_encode($val) : $val }}</span>
                                                         </li>
                                                     @endforeach
                                                 </ul>
                                             </div>
                                             @endif
 
-                                            {{-- Data Baru (SESUDAH) --}}
                                             @if(!empty($new))
                                             <div>
-                                                <span class="inline-block px-2 py-1 rounded-md bg-emerald-50 text-emerald-600 text-[10px] font-bold mb-3 border border-emerald-100">
-                                                    SESUDAH
-                                                </span>
+                                                <span class="inline-block px-2 py-1 rounded-md bg-emerald-50 text-emerald-600 text-[10px] font-bold mb-3 border border-emerald-100">SESUDAH</span>
                                                 <ul class="space-y-2">
                                                     @foreach($new as $key => $val)
-                                                        <li class="flex flex-col sm:flex-row justify-between border-b border-slate-50 pb-1 border-dashed">
-                                                            <span class="text-slate-500 capitalize font-medium text-xs">{{ str_replace('_', ' ', $key) }}</span>
-                                                            <span class="font-mono text-slate-900 font-bold text-right break-all text-xs">{{ is_array($val) ? json_encode($val) : $val }}</span>
+                                                        <li class="flex justify-between border-b border-slate-50 pb-1 border-dashed">
+                                                            <span class="text-slate-500 capitalize text-xs">{{ str_replace('_', ' ', $key) }}</span>
+                                                            <span class="font-mono text-slate-900 font-bold text-right text-xs">{{ is_array($val) ? json_encode($val) : $val }}</span>
                                                         </li>
                                                     @endforeach
                                                 </ul>
                                             </div>
                                             @endif
-
                                         </div>
+
+                                    @elseif(!empty($attributes))
+                                        {{-- TAMPILAN UNTUK TAMBAH DATA (Grid Card) --}}
+                                        <div>
+                                            <span class="inline-block px-2 py-1 rounded-md bg-blue-50 text-blue-600 text-[10px] font-bold mb-3 border border-blue-100">DATA BARU</span>
+                                            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                                                @foreach($attributes as $key => $val)
+                                                    @if(!in_array($key, $ignored))
+                                                    <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                                                        <div class="text-[10px] text-slate-400 uppercase font-bold mb-1">{{ str_replace('_', ' ', $key) }}</div>
+                                                        <div class="text-xs font-medium text-slate-800 truncate" title="{{ $val }}">{{ $val }}</div>
+                                                    </div>
+                                                    @endif
+                                                @endforeach
+                                            </div>
+                                        </div>
+
                                     @else
+                                        {{-- JIKA TIDAK ADA RINCIAN --}}
                                         <div class="text-center py-4">
-                                            <p class="text-slate-400 italic text-sm">
-                                                Tidak ada rincian data teknis yang terekam untuk aktivitas ini.
-                                            </p>
+                                            <p class="text-slate-400 italic text-sm">Tidak ada rincian data teknis.</p>
                                         </div>
                                     @endif
 
                                     {{-- Metadata Tambahan --}}
                                     <div class="mt-6 pt-4 border-t border-slate-100 flex flex-wrap gap-4 text-[10px] text-slate-400">
-                                        <div class="flex items-center gap-2 bg-slate-50 px-2 py-1 rounded">
-                                            <i class="fas fa-globe"></i> IP: {{ $log->ip_address ?? 'Unknown' }}
-                                        </div>
-                                        <div class="flex items-center gap-2 bg-slate-50 px-2 py-1 rounded">
-                                            <i class="fas fa-desktop"></i> Browser: {{ Str::limit($log->user_agent, 60) ?? 'Unknown' }}
-                                        </div>
+                                        <div class="flex items-center gap-2 bg-slate-50 px-2 py-1 rounded"><i class="fas fa-globe"></i> IP: {{ $log->ip_address ?? '-' }}</div>
+                                        <div class="flex items-center gap-2 bg-slate-50 px-2 py-1 rounded"><i class="fas fa-desktop"></i> {{ Str::limit($log->user_agent, 50) }}</div>
                                     </div>
                                 </div>
                             </td>

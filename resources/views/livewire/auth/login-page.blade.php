@@ -299,7 +299,7 @@
         </a>
 
         <div class="footer-copy">
-            &copy; {{ date('Y') }} Pemerintah Desa Maju Jaya.<br>All Rights Reserved.
+            &copy; {{ date('Y') }} SITANAS by Kelompok Biru<br>All Rights Reserved.
         </div>
 
     </div>
