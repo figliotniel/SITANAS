@@ -53,7 +53,7 @@ composer install
 npm install
 ```
 
-3. Konfigurasi Environment
+### 3. Konfigurasi Environment
 Salin file konfigurasi contoh dan sesuaikan dengan pengaturan database lokal Anda:
 ```bash
 cp .env.example .env
@@ -65,4 +65,26 @@ Buka file .env dan atur koneksi database:
 DB_DATABASE=sitanas_db
 DB_USERNAME=root
 DB_PASSWORD=
+```
+
+### 4. Generate Key & Migrasi Database
+Buat kunci aplikasi dan jalankan migrasi database beserta data awal (seeder):
+```bash
+php artisan key:generate
+php artisan migrate --seed
+```
+
+### > Catatan: Perintah --seed akan membuat akun Admin default agar Anda bisa masuk ke sistem.
+
+5. Jalankan Aplikasi
+Buka dua terminal terpisah untuk menjalankan server backend dan build frontend:
+
+Terminal 1 (Server Laravel):
+```bash
+php artisan serve
+Terminal 2 (Vite Hot Reload):
+```
+```bash
+npm run dev
+Akses aplikasi melalui browser di: http://127.0.0.1:8000
 ```
