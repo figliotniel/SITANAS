@@ -42,7 +42,7 @@ Ikuti langkah-langkah berikut untuk menjalankan proyek ini di komputer lokal And
 ### 1. Clone Repositori
 Unduh kode sumber proyek ke komputer Anda:
 ```bash
-git clone (https://github.com/figliotniel/SITANAS.git)
+git clone https://github.com/figliotniel/SITANAS.git
 cd sitanas
 ```
 
