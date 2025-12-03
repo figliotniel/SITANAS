@@ -1,4 +1,4 @@
-# SITANAS (Sistem Informasi Tanah Kas Desa)
+# SITANAS (Sistem Informasi Tanah Kas Desa) by Kelompok Biru
 
 ![Laravel](https://img.shields.io/badge/Laravel-12.x-FF2D20?style=for-the-badge&logo=laravel)
 ![Livewire](https://img.shields.io/badge/Livewire-3.x-4E56A6?style=for-the-badge&logo=livewire)
