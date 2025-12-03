@@ -14,8 +14,6 @@ class DashboardPage extends Component
 
     public $searchTerm = '';
     public $filterStatus = '';
-    
-    // Properti Modal Validasi
     public $showValidasiModal = false;
     public $validasiAsetId;
     public $validasiStatus;
@@ -37,7 +35,7 @@ class DashboardPage extends Component
     {
         $this->validasiAsetId = $id;
         $this->validasiStatus = $status;
-        $this->validasiCatatan = ''; // Reset catatan
+        $this->validasiCatatan = '';
         $this->showValidasiModal = true;
     }
 
@@ -81,8 +79,6 @@ class DashboardPage extends Component
             ->when($this->filterStatus, function($q) {
                 $q->where('status_validasi', $this->filterStatus);
             });
-
-        // Urutkan dari yang terbaru
         $aset = $query->orderBy('created_at', 'desc')->paginate(10);
 
         return view('livewire.dashboard.dashboard-page', [

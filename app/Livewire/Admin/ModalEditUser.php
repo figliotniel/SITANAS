@@ -10,34 +10,19 @@ use Illuminate\Validation\Rules\Password;
 
 class ModalEditUser extends Component
 {
-    // Properti yang dikirim dari halaman utama
     public $userId;
-
-    // Properti untuk data user
     public $user;
     public $roles;
-
-    // Properti untuk form 'Edit Data'
     public $nama_lengkap;
     public $email;
     public $role_id;
-
-    // Properti untuk form 'Reset Password'
     public $new_password;
     public $new_password_confirmation;
-
-    /**
-     * Fungsi MOUNT()
-     * Berjalan saat komponen modal ini dibuat.
-     * Mengambil data user yang akan diedit.
-     */
     public function mount($userId)
     {
         $this->userId = $userId;
         $this->user = User::find($userId);
         $this->roles = Role::all();
-
-        // Isi properti form dengan data yang ada
         $this->nama_lengkap = $this->user->nama_lengkap;
         $this->email = $this->user->email;
         $this->role_id = $this->user->role_id;
@@ -50,7 +35,7 @@ class ModalEditUser extends Component
     {
         $validated = $this->validate([
             'nama_lengkap' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $this->userId, // Cek unik, kecuali untuk user ini
+            'email' => 'required|email|unique:users,email,' . $this->userId, 
             'role_id' => 'required|exists:roles,id',
         ]);
 

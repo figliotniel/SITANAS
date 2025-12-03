@@ -12,10 +12,8 @@ class TambahAset extends Component
 {
     public $pageTitle = 'Tambah Aset Tanah';
     public $saveButtonText = 'Simpan Aset Baru';
-
-    // Properti Form
     public $kode_barang;
-    public $nama_barang; // <--- Properti Baru
+    public $nama_barang;
     public $nup;
     public $asal_perolehan;
     public $tanggal_perolehan;
@@ -40,7 +38,7 @@ class TambahAset extends Component
 
     protected $rules = [
         'kode_barang'       => 'required|string|unique:tanah_kas_desa,kode_barang',
-        'nama_barang'       => 'required|string|max:255', // <--- Validasi Baru
+        'nama_barang'       => 'required|string|max:255',
         'asal_perolehan'    => 'required|string',
         'tanggal_perolehan' => 'required|date',
         'harga_perolehan'   => 'required|numeric|min:0',
@@ -63,7 +61,7 @@ class TambahAset extends Component
 
         TanahKasDesa::create([
             'kode_barang'        => $this->kode_barang,
-            'nama_barang'        => $this->nama_barang, // <--- Simpan Baru
+            'nama_barang'        => $this->nama_barang,
             'nup'                => $this->nup,
             'asal_perolehan'     => $this->asal_perolehan,
             'tanggal_perolehan'  => $this->tanggal_perolehan,

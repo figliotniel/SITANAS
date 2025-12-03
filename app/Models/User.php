@@ -46,9 +46,17 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-
-        public function role()
+    public function role()
     {
         return $this->belongsTo(Role::class);
+    }
+
+    /**
+     * Cek apakah user adalah Admin.
+     */
+    public function isAdmin(): bool
+    {
+        // Kita asumsikan ID 1 adalah 'Admin Desa' sesuai RoleSeeder
+        return $this->role_id === 1;
     }
 }

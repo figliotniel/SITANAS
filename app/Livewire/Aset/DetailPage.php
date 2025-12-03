@@ -13,10 +13,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 class DetailPage extends Component
 {
     use WithFileUploads;
-
     public TanahKasDesa $aset;
-
-    // --- VARIABEL FORM INPUT PEMANFAATAN (Wajib Sinkron dengan View) ---
     public $p_pihak_ketiga;
     public $p_bentuk_pemanfaatan = 'Sewa';
     public $p_tanggal_mulai;
@@ -28,7 +25,6 @@ class DetailPage extends Component
 
     public function mount(TanahKasDesa $aset)
     {
-        // Load relasi agar tidak berat saat query
         $this->aset = $aset->load(['pemanfaatan', 'diinput_oleh_user', 'divalidasi_oleh_user']);
     }
 
@@ -58,7 +54,6 @@ class DetailPage extends Component
         // 3. Proses Upload Bukti (Jika ada)
         $pathBukti = null;
         if ($this->p_path_bukti) {
-            // Simpan ke folder: storage/app/public/bukti_pemanfaatan/{ID_ASET}
             $pathBukti = $this->p_path_bukti->store('bukti_pemanfaatan/' . $this->aset->id, 'public');
         }
 

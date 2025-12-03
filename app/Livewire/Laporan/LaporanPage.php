@@ -12,18 +12,14 @@ use Livewire\WithPagination;
 class LaporanPage extends Component
 {
     use WithPagination;
-
-    // Filter properties
     public $searchTerm = '';
     public $filterStatus = '';
     public $filterKondisi = '';
-    public $filterDate = ''; // <--- Ganti variable dateStart/End jadi satu
-
-    // Reset pagination saat filter berubah
+    public $filterDate = '';
     public function updatingSearchTerm() { $this->resetPage(); }
     public function updatingFilterStatus() { $this->resetPage(); }
     public function updatingFilterKondisi() { $this->resetPage(); }
-    public function updatingFilterDate() { $this->resetPage(); } // Update method
+    public function updatingFilterDate() { $this->resetPage(); }
 
     /**
      * Query Builder Pusat
@@ -45,7 +41,6 @@ class LaporanPage extends Component
             ->when($this->filterKondisi, function($q) {
                 $q->where('kondisi', $this->filterKondisi);
             })
-            // Filter Tanggal Tunggal (Cari data pada tanggal spesifik)
             ->when($this->filterDate, function($q) {
                 $q->whereDate('created_at', $this->filterDate);
             })
@@ -91,7 +86,7 @@ class LaporanPage extends Component
 
         $callback = function() use($dataAset, $columns) {
             $file = fopen('php://output', 'w');
-            fputs($file, "\xEF\xBB\xBF"); // BOM untuk Excel
+            fputs($file, "\xEF\xBB\xBF");
             fputcsv($file, $columns);
 
             foreach ($dataAset as $aset) {

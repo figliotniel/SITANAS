@@ -4,18 +4,20 @@ namespace App\Livewire\Admin;
 
 use Livewire\Component;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
 use App\Models\TanahKasDesa;
 use Livewire\WithPagination;
 
 #[Layout('layouts.app')]
+#[Title('Arsip Aset')]
 class ArsipAset extends Component
 {
     use WithPagination;
 
     public function mount()
     {
-        if (auth()->user()->role_id != 1) {
-            return redirect('/');
+        if (! auth()->user()->isAdmin()) {
+            abort(403, 'Anda tidak memiliki akses ke halaman arsip.');
         }
     }
 
@@ -25,7 +27,7 @@ class ArsipAset extends Component
 
         if ($aset) {
             $aset->restore();
-            session()->flash('success', 'Data aset berhasil dipulihkan.');
+            session()->flash('success', 'Data aset berhasil dipulihkan.'); 
         }
     }
 
@@ -41,10 +43,8 @@ class ArsipAset extends Component
 
     public function render()
     {
-        $asetArsip = TanahKasDesa::onlyTrashed()->paginate(10);
-
         return view('livewire.admin.arsip-aset', [
-            'asetArsip' => $asetArsip
+            'asetArsip' => TanahKasDesa::onlyTrashed()->latest('deleted_at')->paginate(10)
         ]);
     }
 }
