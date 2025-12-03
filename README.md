@@ -1,59 +1,133 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# SITANAS (Sistem Informasi Tanah Kas Desa) by Kelompok Biru
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+![Laravel](https://img.shields.io/badge/Laravel-12.x-FF2D20?style=for-the-badge&logo=laravel)
+![Livewire](https://img.shields.io/badge/Livewire-3.x-4E56A6?style=for-the-badge&logo=livewire)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0-38B2AC?style=for-the-badge&logo=tailwind-css)
 
-## About Laravel
+**SITANAS** adalah aplikasi berbasis web yang dirancang untuk digitalisasi manajemen aset desa, khususnya **Tanah Kas Desa**. Sistem ini memfasilitasi pencatatan inventaris (NUP, Kode Barang), aspek legalitas (Sertifikat), kondisi fisik, hingga proses validasi berjenjang antara operator dan admin.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🚀 Fitur Utama
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **Manajemen Aset Tanah**: Pencatatan data tanah yang mendetail meliputi luas, lokasi, batas wilayah, dan koordinat.
+- **Validasi Berjenjang**: Alur kerja persetujuan data dengan status *Draft*, *Diproses*, *Disetujui*, atau *Ditolak*, dilengkapi catatan validasi.
+- **Arsip & Pemulihan**: Fitur keamanan data dengan *Soft Delete* (Tong Sampah), memungkinkan pemulihan data aset yang terhapus secara tidak sengaja.
+- **Cetak Laporan**: Ekspor data detail aset ke format PDF siap cetak.
+- **Manajemen Pengguna**: Pengaturan hak akses berbasis peran (*Role-based Access Control*) untuk Admin dan Operator.
+- **Keamanan & Backup**: Terintegrasi dengan *Spatie Backup* untuk pencadangan database otomatis demi keamanan data instansi.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 🛠️ Tech Stack
 
-## Learning Laravel
+Aplikasi ini dibangun menggunakan teknologi modern (**TALL Stack**):
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+- **Backend**: Laravel Framework v12.x
+- **Frontend**: Livewire v3.6 (Interaktivitas Full-stack)
+- **Styling**: Tailwind CSS v4.0
+- **Database**: MySQL / MariaDB
+- **Testing**: K6 (Load & Stress Testing)
+- **PDF Engine**: Laravel DomPDF
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 📋 Prasyarat Sistem
 
-## Laravel Sponsors
+Sebelum memulai instalasi, pastikan lingkungan pengembangan Anda memiliki:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- PHP >= 8.2
+- Composer
+- Node.js & NPM
+- Database MySQL/MariaDB
 
-### Premium Partners
+## 💻 Panduan Instalasi (Local Development)
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Ikuti langkah-langkah berikut untuk menjalankan proyek ini di komputer lokal Anda:
 
-## Contributing
+### 1. Clone Repositori
+Unduh kode sumber proyek ke komputer Anda:
+```bash
+git clone https://github.com/figliotniel/SITANAS.git
+cd sitanas
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 2. Instal Dependensi
+Instal pustaka PHP dan JavaScript yang dibutuhkan:
+``` bash
+composer install
+npm install
+```
 
-## Code of Conduct
+### 3. Konfigurasi Environment
+Salin file konfigurasi contoh dan sesuaikan dengan pengaturan database lokal Anda:
+```bash
+cp .env.example .env
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Buka file .env dan atur koneksi database:
 
-## Security Vulnerabilities
+```Code snippet
+DB_DATABASE=sitanas_db
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 4. Generate Key & Migrasi Database
+Buat kunci aplikasi dan jalankan migrasi database beserta data awal (seeder):
+```bash
+php artisan key:generate
+php artisan migrate --seed
+```
 
-## License
+#### > Catatan: Perintah --seed akan membuat akun Admin default agar Anda bisa masuk ke sistem.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+### 5. Jalankan Aplikasi
+Buka dua terminal terpisah untuk menjalankan server backend dan build frontend:
+
+#### Terminal 1 (Server Laravel):
+```bash
+php artisan serve
+```
+
+#### Terminal 2 (Vite Hot Reload):
+```bash
+npm run dev
+Akses aplikasi melalui browser di: http://127.0.0.1:8000
+```
+
+
+## 🧪 Panduan Testing (Stress Test)
+SITANAS dilengkapi dengan skenario Stress Testing menggunakan k6 untuk menguji performa server di bawah beban tinggi.
+### 1. Pastikan k6 sudah terinstal di sistem Anda.
+### 2. Pastikan server Laravel sedang berjalan.
+### 3. Jalankan skenario tes:
+```bash
+k6 run stress_test.js
+```
+#### > Skrip ini akan mensimulasikan akses dari 150 pengguna virtual secara bersamaan untuk menguji stabilitas aplikasi.
+
+## ☁️ Panduan Deployment (Production)
+Langkah-langkah untuk menyebarkan aplikasi ke server produksi (VPS/Hosting):
+### 1. Permission Folder: Pastikan folder storage/ dan bootstrap/cache/ memiliki izin tulis (biasanya 775).
+### 2. Environment: Ubah pengaturan di file .env:
+```Code snippet
+APP_ENV=production
+APP_DEBUG=false
+```
+
+### 3. Optimasi: Jalankan perintah optimasi Laravel:
+```bash
+composer install --optimize-autoloader --no-dev
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
+
+### 4. Build Frontend: Kompilasi aset CSS dan JS untuk produksi:
+```bash
+npm run build
+```
+
+### 5. Migrasi: Jalankan migrasi database di server produksi:
+```bash
+php artisan migrate --force
+```
+
+## 📄 Lisensi
+SITANAS adalah perangkat lunak open-source di bawah lisensi MIT.
