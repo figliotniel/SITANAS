@@ -74,17 +74,60 @@ php artisan key:generate
 php artisan migrate --seed
 ```
 
-### > Catatan: Perintah --seed akan membuat akun Admin default agar Anda bisa masuk ke sistem.
+#### > Catatan: Perintah --seed akan membuat akun Admin default agar Anda bisa masuk ke sistem.
 
-5. Jalankan Aplikasi
+
+### 5. Jalankan Aplikasi
 Buka dua terminal terpisah untuk menjalankan server backend dan build frontend:
 
-Terminal 1 (Server Laravel):
+#### Terminal 1 (Server Laravel):
 ```bash
 php artisan serve
-Terminal 2 (Vite Hot Reload):
 ```
+
+#### Terminal 2 (Vite Hot Reload):
 ```bash
 npm run dev
 Akses aplikasi melalui browser di: http://127.0.0.1:8000
 ```
+
+
+## 🧪 Panduan Testing (Stress Test)
+SITANAS dilengkapi dengan skenario Stress Testing menggunakan k6 untuk menguji performa server di bawah beban tinggi.
+### 1. Pastikan k6 sudah terinstal di sistem Anda.
+### 2. Pastikan server Laravel sedang berjalan.
+### 3. Jalankan skenario tes:
+```bash
+k6 run stress_test.js
+```
+#### > Skrip ini akan mensimulasikan akses dari 150 pengguna virtual secara bersamaan untuk menguji stabilitas aplikasi.
+
+## ☁️ Panduan Deployment (Production)
+Langkah-langkah untuk menyebarkan aplikasi ke server produksi (VPS/Hosting):
+### 1. Permission Folder: Pastikan folder storage/ dan bootstrap/cache/ memiliki izin tulis (biasanya 775).
+### 2. Environment: Ubah pengaturan di file .env:
+```Code snippet
+APP_ENV=production
+APP_DEBUG=false
+```
+
+### 3. Optimasi: Jalankan perintah optimasi Laravel:
+```bash
+composer install --optimize-autoloader --no-dev
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
+
+### 4. Build Frontend: Kompilasi aset CSS dan JS untuk produksi:
+```bash
+npm run build
+```
+
+### 5. Migrasi: Jalankan migrasi database di server produksi:
+```bash
+php artisan migrate --force
+```
+
+## 📄 Lisensi
+SITANAS adalah perangkat lunak open-source di bawah lisensi MIT.
