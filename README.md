@@ -44,11 +44,25 @@ Unduh kode sumber proyek ke komputer Anda:
 ```bash
 git clone [https://github.com/username/sitanas.git](https://github.com/username/sitanas.git)
 cd sitanas
+```
 
 ### 2. Instal Dependensi
 Instal pustaka PHP dan JavaScript yang dibutuhkan:
-
-Bash
-
+``` bash
 composer install
 npm install
+```
+
+3. Konfigurasi Environment
+Salin file konfigurasi contoh dan sesuaikan dengan pengaturan database lokal Anda:
+```bash
+cp .env.example .env
+```
+
+Buka file .env dan atur koneksi database:
+
+```Code snippet
+DB_DATABASE=sitanas_db
+DB_USERNAME=root
+DB_PASSWORD=
+```
