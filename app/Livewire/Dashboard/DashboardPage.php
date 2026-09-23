@@ -81,8 +81,15 @@ class DashboardPage extends Component
             });
         $aset = $query->orderBy('created_at', 'desc')->paginate(10);
 
+        $earlyWarnings = \App\Models\PemanfaatanTanah::with('tanah')
+            ->where('tanggal_selesai', '>=', now())
+            ->where('tanggal_selesai', '<=', now()->addDays(30))
+            ->orderBy('tanggal_selesai', 'asc')
+            ->get();
+
         return view('livewire.dashboard.dashboard-page', [
-            'aset_tanah' => $aset
+            'aset_tanah' => $aset,
+            'earlyWarnings' => $earlyWarnings
         ]);
     }
 }

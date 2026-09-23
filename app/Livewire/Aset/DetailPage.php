@@ -23,9 +23,44 @@ class DetailPage extends Component
     public $p_path_bukti;
     public $p_keterangan;
 
+    public $catatan_validasi;
+
     public function mount(TanahKasDesa $aset)
     {
         $this->aset = $aset->load(['pemanfaatan', 'diinput_oleh_user', 'divalidasi_oleh_user']);
+    }
+
+    public function setujuiAset()
+    {
+        if (Auth::user()->role_id != 2) return;
+        
+        $this->aset->update([
+            'status_validasi' => 'Disetujui',
+            'catatan_validasi' => null,
+            'divalidasi_oleh' => Auth::id()
+        ]);
+        
+        session()->flash('success', 'Aset berhasil disetujui.');
+    }
+
+    public function prosesValidasi()
+    {
+        if (Auth::user()->role_id != 2) return;
+        
+        $this->validate([
+            'catatan_validasi' => 'required|string|min:5'
+        ], [
+            'catatan_validasi.required' => 'Catatan penolakan wajib diisi.',
+            'catatan_validasi.min' => 'Catatan penolakan minimal 5 karakter.'
+        ]);
+
+        $this->aset->update([
+            'status_validasi' => 'Ditolak',
+            'catatan_validasi' => $this->catatan_validasi,
+            'divalidasi_oleh' => Auth::id()
+        ]);
+        
+        session()->flash('success', 'Aset dikembalikan ke admin dengan status Ditolak.');
     }
 
     public function simpanPemanfaatan()
@@ -50,6 +85,17 @@ class DetailPage extends Component
             'p_tanggal_selesai.after_or_equal' => 'Tanggal selesai tidak boleh sebelum tanggal mulai.',
             'p_nilai_kontribusi.required' => 'Nilai kontribusi wajib diisi (isi 0 jika gratis).',
         ]);
+
+        // Cek Overlap Kontrak
+        $overlap = $this->aset->pemanfaatan()
+            ->where('tanggal_selesai', '>=', $validated['p_tanggal_mulai'])
+            ->where('tanggal_mulai', '<=', $validated['p_tanggal_selesai'])
+            ->exists();
+            
+        if ($overlap) {
+            session()->flash('error', 'Gagal: Tanggal kontrak tumpang tindih (overlap) dengan kontrak pemanfaatan lain yang sudah ada.');
+            return;
+        }
 
         // 3. Proses Upload Bukti (Jika ada)
         $pathBukti = null;
@@ -86,7 +132,11 @@ class DetailPage extends Component
     {
         if (!$this->aset) return;
         
-        $pdf = Pdf::loadView('pdf.detail-aset', ['aset' => $this->aset]);
+        $profilDesa = \App\Models\ProfilDesa::getProfil();
+        $pdf = Pdf::loadView('pdf.detail-aset', [
+            'aset' => $this->aset,
+            'desa' => $profilDesa
+        ]);
         $pdf->setPaper('a4', 'portrait');
 
         $namaFile = 'Detail-Aset-' . ($this->aset->kode_barang ?? 'X') . '.pdf';

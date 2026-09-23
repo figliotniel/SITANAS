@@ -52,45 +52,47 @@
 <body>
     <div class="header">
         <h2>LAPORAN ASET TANAH KAS DESA</h2>
-        <p>Pemerintah Desa [Nama Desa]</p>
+        <p>Pemerintah Desa {{ $desa?->nama_desa ?? '[Nama Desa Belum Diatur]' }}</p>
+        <p>Kecamatan {{ $desa?->kecamatan ?? '-' }}, Kabupaten {{ $desa?->kabupaten ?? '-' }}</p>
         <p><small>Dicetak pada: {{ date('d-m-Y H:i') }}</small></p>
     </div>
 
     <table>
         <thead>
             <tr>
-                <th width="5%">No</th>
-                <th width="15%">Kode / NUP</th>
-                <th width="20%">Lokasi</th>
-                <th width="10%">Luas (m²)</th>
-                <th width="10%">Tahun</th>
-                <th width="15%">Harga Perolehan</th>
-                <th width="10%">Kondisi</th>
-                <th width="15%">Status</th>
+                <th width="3%">No</th>
+                <th width="15%">Nama / Jenis Barang</th>
+                <th width="12%">Kode / NUP</th>
+                <th width="7%">Luas (m²)</th>
+                <th width="5%">Tahun</th>
+                <th width="15%">Letak / Alamat</th>
+                <th width="15%">Status Sertifikat</th>
+                <th width="10%">Penggunaan</th>
+                <th width="10%">Asal Usul</th>
+                <th width="8%">Harga</th>
             </tr>
         </thead>
         <tbody>
             @forelse($dataAset as $index => $item)
             <tr>
                 <td class="text-center">{{ $index + 1 }}</td>
+                <td>{{ $item->nama_barang ?? '-' }}</td>
                 <td>
                     <strong>{{ $item->kode_barang }}</strong><br>
                     <small>NUP: {{ $item->nup ?? '-' }}</small>
                 </td>
-                <td>{{ $item->lokasi }}</td>
                 <td class="text-right">{{ number_format($item->luas, 0, ',', '.') }}</td>
                 <td class="text-center">
                     {{ $item->tanggal_perolehan ? \Carbon\Carbon::parse($item->tanggal_perolehan)->format('Y') : '-' }}
                 </td>
-                <td class="text-right">
-                    Rp{{ number_format($item->harga_perolehan, 0, ',', '.') }}
+                <td>{{ $item->lokasi }}</td>
+                <td>
+                    {{ $item->status_sertifikat }}<br>
+                    <small>{{ $item->nomor_sertifikat ?? '-' }}</small>
                 </td>
-                <td class="text-center">{{ $item->kondisi }}</td>
-                <td class="text-center">
-                    <span class="badge status-{{ strtolower($item->status_validasi) }}">
-                        {{ $item->status_validasi }}
-                    </span>
-                </td>
+                <td>{{ $item->penggunaan }}</td>
+                <td>{{ $item->asal_perolehan }}</td>
+                <td class="text-right">Rp{{ number_format($item->harga_perolehan, 0, ',', '.') }}</td>
             </tr>
             @empty
             <tr>
@@ -107,9 +109,12 @@
 
     <div class="footer-signature">
         <div class="signature-box">
-            <p>Mengetahui,<br>Kepala Desa</p>
+            <p>Mengetahui,<br>Kepala Desa {{ $desa?->nama_desa ?? '[Nama Desa]' }}</p>
             <br><br><br>
-            <p>( .................................... )</p>
+            <p><strong>{{ $desa?->nama_kepala_desa ?? '( .................................... )' }}</strong></p>
+            @if($desa?->nip_kepala_desa)
+            <p style="margin-top: -10px;">NIP/NRPDes: {{ $desa->nip_kepala_desa }}</p>
+            @endif
         </div>
     </div>
 

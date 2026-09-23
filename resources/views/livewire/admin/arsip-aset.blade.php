@@ -75,13 +75,15 @@
                                         <i class="fas fa-undo-alt mr-2"></i> Pulihkan
                                     </button>
 
-                                    <button 
-                                        wire:click="hapusPermanen({{ $aset->id }})" 
-                                        wire:confirm="PERINGATAN FATAL: Data ini akan dihapus SELAMANYA dan tidak bisa dikembalikan lagi. Anda yakin?"
-                                        class="inline-flex items-center px-3 py-2 bg-white border border-red-200 text-red-600 rounded-lg text-xs font-bold hover:bg-red-50 hover:border-red-300 transition shadow-sm"
-                                        title="Hapus Permanen">
-                                        <i class="fas fa-trash mr-2"></i> Hapus Permanen
-                                    </button>
+                                    @if($aset->status_validasi !== 'Disetujui')
+                                        <button 
+                                            wire:click="hapusPermanen({{ $aset->id }})" 
+                                            wire:confirm="PERINGATAN FATAL: Data ini akan dihapus SELAMANYA dan tidak bisa dikembalikan lagi. Anda yakin?"
+                                            class="inline-flex items-center px-3 py-2 bg-white border border-red-200 text-red-600 rounded-lg text-xs font-bold hover:bg-red-50 hover:border-red-300 transition shadow-sm"
+                                            title="Hapus Permanen">
+                                            <i class="fas fa-trash mr-2"></i> Hapus Permanen
+                                        </button>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

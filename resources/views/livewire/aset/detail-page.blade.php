@@ -62,6 +62,49 @@
         </div>
     </div>
 
+    {{-- BAGIAN VALIDASI (Kepala Desa & Admin) --}}
+    @if($aset->status_validasi == 'Diproses' && auth()->user()->role_id == 2)
+        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 shadow-sm">
+            <h3 class="text-amber-800 font-bold mb-2">Validasi Aset (Kepala Desa)</h3>
+            <p class="text-sm text-amber-700 mb-4">Aset ini menunggu persetujuan Anda sebelum dipublikasikan.</p>
+            <form wire:submit="prosesValidasi" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-amber-900 mb-1">Catatan / Alasan Penolakan (Wajib jika ditolak)</label>
+                    <textarea wire:model="catatan_validasi" class="w-full rounded-lg border-amber-300 focus:ring-amber-500 focus:border-amber-500 bg-white" rows="2" placeholder="Tuliskan catatan untuk admin..."></textarea>
+                    @error('catatan_validasi') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
+                </div>
+                <div class="flex gap-3">
+                    <button type="button" wire:click="setujuiAset" class="px-5 py-2 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 shadow-sm">
+                        <i class="fas fa-check mr-1"></i> Setujui Aset
+                    </button>
+                    <button type="submit" class="px-5 py-2 bg-rose-600 text-white font-medium rounded-lg hover:bg-rose-700 shadow-sm">
+                        <i class="fas fa-times mr-1"></i> Tolak & Kembalikan
+                    </button>
+                </div>
+            </form>
+        </div>
+    @elseif($aset->status_validasi == 'Ditolak')
+        <div class="bg-rose-50 border border-rose-200 rounded-2xl p-6 shadow-sm">
+            <div class="flex items-start gap-4">
+                <div class="mt-1 p-2 bg-rose-100 text-rose-600 rounded-full">
+                    <i class="fas fa-exclamation-circle text-xl"></i>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-rose-800 font-bold">Aset Ditolak oleh Kepala Desa</h3>
+                    <p class="text-sm text-rose-700 mt-1"><strong>Alasan:</strong> {{ $aset->catatan_validasi ?? 'Tidak ada catatan.' }}</p>
+                    
+                    @if(auth()->user()->role_id == 1)
+                    <div class="mt-4 flex gap-3">
+                        <a href="{{ route('aset.edit', $aset->id) }}" class="px-4 py-2 bg-rose-600 text-white text-sm font-medium rounded-lg hover:bg-rose-700 shadow-sm inline-flex items-center gap-2">
+                            <i class="fas fa-edit"></i> Edit & Ajukan Ulang
+                        </a>
+                    </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    @endif
+
     {{-- BAGIAN 2: PETA & DETAIL (Grid 3 Kolom) --}}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {{-- Kiri: Peta --}}

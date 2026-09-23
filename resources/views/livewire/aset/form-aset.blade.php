@@ -74,6 +74,22 @@
                             </div>
                         </div>
 
+                        {{-- Bukti Perolehan --}}
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Bukti Perolehan</label>
+                            <select wire:model="bukti_perolehan" class="w-full rounded-lg border-slate-300 text-sm py-2.5 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">Pilih Bukti Perolehan...</option>
+                                <option value="Sertifikat">Sertifikat</option>
+                                <option value="Akta Jual Beli">Akta Jual Beli</option>
+                                <option value="Hibah">Hibah</option>
+                                <option value="Wakaf">Wakaf</option>
+                                <option value="Tukar Menukar">Tukar Menukar</option>
+                                <option value="Lelang">Lelang</option>
+                                <option value="Putusan Pengadilan">Putusan Pengadilan</option>
+                                <option value="Tidak Ada Bukti">Tidak Ada Bukti</option>
+                            </select>
+                        </div>
+
                         {{-- Luas & Harga --}}
                         <div class="grid grid-cols-2 gap-6">
                             <div>

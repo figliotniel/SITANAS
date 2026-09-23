@@ -23,8 +23,6 @@ class LoginPage extends Component
         $credentials['status'] = 'aktif';
 
         if (Auth::attempt($credentials)) {
-            
-            // 4. Regenerate session (keamanan)
             request()->session()->regenerate();
 
             return redirect()->intended('/');

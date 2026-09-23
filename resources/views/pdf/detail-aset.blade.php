@@ -73,7 +73,8 @@
 <body>
     <div class="header">
         <h1>Laporan Detail Aset Tanah Kas Desa</h1>
-        <p>Kode Barang: {{ $aset->kode_barang ?? '-' }}</p>
+        <p>Pemerintah Desa {{ $desa?->nama_desa ?? '[Nama Desa Belum Diatur]' }}</p>
+        <p>Kecamatan {{ $desa?->kecamatan ?? '-' }}, Kabupaten {{ $desa?->kabupaten ?? '-' }}</p>
     </div>
 
     <h4>Informasi Utama</h4>

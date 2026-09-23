@@ -35,4 +35,10 @@ class LogAktivitas extends Model
     {
         return $this->morphTo();
     }
+
+    // Prevent deletion of log entries
+    public function delete()
+    {
+        throw new \Exception("Log Aktivitas bersifat immutable dan tidak dapat dihapus.");
+    }
 }

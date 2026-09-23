@@ -32,6 +32,7 @@
                                     <a href="{{ route('admin.users') }}" wire:navigate class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50">Manajemen User</a>
                                     <a href="{{ route('admin.arsip') }}" wire:navigate class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50">Arsip Aset</a>
                                     <a href="{{ route('admin.log') }}" wire:navigate class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50">Log Aktivitas</a>
+                                    <a href="{{ route('admin.pengaturan') }}" wire:navigate class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50">Pengaturan Desa</a>
                                 </div>
                             </div>
                         @endif
@@ -81,6 +82,7 @@
                         <a href="{{ route('admin.users') }}" wire:navigate class="block px-3 py-2 rounded-md text-base text-slate-300 hover:bg-slate-800">Manajemen User</a>
                         <a href="{{ route('admin.arsip') }}" wire:navigate class="block px-3 py-2 rounded-md text-base text-slate-300 hover:bg-slate-800">Arsip Aset</a>
                         <a href="{{ route('admin.log') }}" wire:navigate class="block px-3 py-2 rounded-md text-base text-slate-300 hover:bg-slate-800">Log Aktivitas</a>
+                        <a href="{{ route('admin.pengaturan') }}" wire:navigate class="block px-3 py-2 rounded-md text-base text-slate-300 hover:bg-slate-800">Pengaturan Desa</a>
                     </div>
                 @endif
             @endauth

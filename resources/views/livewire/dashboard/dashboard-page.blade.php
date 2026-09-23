@@ -13,6 +13,32 @@
         @endif
     </div>
 
+    @if(isset($earlyWarnings) && $earlyWarnings->count() > 0)
+        <div class="bg-rose-50 border border-rose-200 rounded-xl p-4 shadow-sm animate-in fade-in">
+            <h3 class="text-rose-800 font-bold flex items-center gap-2 mb-3">
+                <i class="fas fa-exclamation-triangle"></i> Early Warning: Kontrak Akan Berakhir (≤ 30 Hari)
+            </h3>
+            <div class="space-y-2">
+                @foreach($earlyWarnings as $warning)
+                    <div class="bg-white px-4 py-3 rounded-lg border border-rose-100 flex justify-between items-center">
+                        <div>
+                            <p class="text-sm font-bold text-slate-800">{{ $warning->tanah->lokasi ?? 'Tanah Tidak Diketahui' }}</p>
+                            <p class="text-xs text-slate-500">Pihak Ketiga: {{ $warning->pihak_ketiga }} ({{ $warning->bentuk_pemanfaatan }})</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm font-bold text-rose-600">
+                                Selesai: {{ \Carbon\Carbon::parse($warning->tanggal_selesai)->format('d M Y') }}
+                            </p>
+                            <p class="text-xs text-slate-500">
+                                {{ \Carbon\Carbon::parse($warning->tanggal_selesai)->diffForHumans() }}
+                            </p>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
     <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
         <div class="flex flex-col sm:flex-row gap-3">
             <div class="relative flex-1">

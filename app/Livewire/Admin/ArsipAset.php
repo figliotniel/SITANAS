@@ -36,6 +36,11 @@ class ArsipAset extends Component
         $aset = TanahKasDesa::onlyTrashed()->find($id);
 
         if ($aset) {
+            if ($aset->status_validasi === 'Disetujui') {
+                session()->flash('error', 'Aset yang telah disetujui tidak dapat dihapus secara permanen karena merupakan dokumen resmi.');
+                return;
+            }
+
             $aset->forceDelete();
             session()->flash('success', 'Data aset berhasil dihapus permanen.');
         }

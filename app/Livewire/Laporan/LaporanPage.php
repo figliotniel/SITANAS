@@ -56,7 +56,11 @@ class LaporanPage extends Component
             return;
         }
 
-        $pdf = Pdf::loadView('pdf.laporan-aset', ['dataAset' => $dataAset]);
+        $profilDesa = \App\Models\ProfilDesa::getProfil();
+        $pdf = Pdf::loadView('pdf.laporan-aset', [
+            'dataAset' => $dataAset,
+            'desa' => $profilDesa
+        ]);
         $pdf->setPaper('a4', 'landscape');
 
         $fileName = 'Laporan-Aset-' . date('d-m-Y-His') . '.pdf';
