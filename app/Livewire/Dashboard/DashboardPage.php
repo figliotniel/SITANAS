@@ -5,6 +5,7 @@ namespace App\Livewire\Dashboard;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 use App\Models\TanahKasDesa;
+use App\Models\PemanfaatanTanah;
 use Livewire\WithPagination;
 
 #[Layout('layouts.app')]
@@ -74,22 +75,33 @@ class DashboardPage extends Component
             ->when($this->searchTerm, function($q) {
                 $q->where('kode_barang', 'like', '%'.$this->searchTerm.'%')
                   ->orWhere('asal_perolehan', 'like', '%'.$this->searchTerm.'%')
-                  ->orWhere('lokasi', 'like', '%'.$this->searchTerm.'%');
+                  ->orWhere('lokasi', 'like', '%'.$this->searchTerm.'%')
+                  ->orWhere('nama_barang', 'like', '%'.$this->searchTerm.'%');
             })
             ->when($this->filterStatus, function($q) {
                 $q->where('status_validasi', $this->filterStatus);
             });
+            
         $aset = $query->orderBy('created_at', 'desc')->paginate(10);
 
-        $earlyWarnings = \App\Models\PemanfaatanTanah::with('tanah')
+        $earlyWarnings = PemanfaatanTanah::with('tanah')
             ->where('tanggal_selesai', '>=', now())
             ->where('tanggal_selesai', '<=', now()->addDays(30))
             ->orderBy('tanggal_selesai', 'asc')
             ->get();
 
+        // Calculate summary stats
+        $stats = [
+            'total_bidang' => TanahKasDesa::count(),
+            'total_luas' => TanahKasDesa::sum('luas'),
+            'menunggu_validasi' => TanahKasDesa::where('status_validasi', 'Diproses')->count(),
+            'early_warning_count' => $earlyWarnings->count(),
+        ];
+
         return view('livewire.dashboard.dashboard-page', [
             'aset_tanah' => $aset,
-            'earlyWarnings' => $earlyWarnings
+            'earlyWarnings' => $earlyWarnings,
+            'stats' => $stats,
         ]);
     }
 }

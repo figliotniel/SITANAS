@@ -4,8 +4,9 @@ namespace App\Livewire\Navigasi;
 
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
+use App\Models\ProfilDesa;
 
-class TopBar extends Component
+class Sidebar extends Component
 {
     public function logout()
     {
@@ -18,6 +19,10 @@ class TopBar extends Component
 
     public function render()
     {
-        return view('livewire.navigasi.top-bar');
+        $desa = ProfilDesa::getProfil();
+
+        return view('livewire.navigasi.sidebar', [
+            'desa' => $desa,
+        ]);
     }
 }

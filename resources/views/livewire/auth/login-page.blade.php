@@ -1,305 +1,216 @@
-<div class="login-container">
-
-    <style>
-        /* 1. SETUP FULL SCREEN (BREAKOUT) */
-        .login-container {
-            position: fixed;
-            top: 0; 
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Inter', sans-serif;
-            overflow: hidden;
-            
-            /* Background Image Berkualitas Tinggi */
-            background-image: url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1932&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
-        }
-
-        /* Overlay Gelap & Blur */
-        .login-container::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.5);
-            backdrop-filter: blur(8px);
-            z-index: -1;
-        }
-
-        /* 2. KARTU GLASSMORPHISM */
-        .glass-card {
-            position: relative;
-            width: 90%;
-            max-width: 420px;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            border-radius: 24px;
-            padding: 3rem;
-            box-shadow: 
-                0 25px 50px -12px rgba(0, 0, 0, 0.5),
-                0 0 0 1px rgba(255, 255, 255, 0.2) inset;
-            
-            /* ANIMASI MASUK: Muncul dari bawah */
-            animation: slideUpFade 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-            transform: translateY(30px);
-            opacity: 0;
-        }
-
-        @keyframes slideUpFade {
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        /* 3. TYPOGRAPHY */
-        .brand-section {
-            text-align: center;
-            margin-bottom: 2.5rem;
-        }
-
-        .logo-icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
-            color: white;
-            font-size: 1.75rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 16px;
-            margin: 0 auto 1rem auto;
-            box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.5);
-            
-            /* Animasi Ikon Berdenyut Halus */
-            animation: pulseGlow 3s infinite;
-        }
-
-        @keyframes pulseGlow {
-            0%, 100% { transform: scale(1); box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.5); }
-            50% { transform: scale(1.05); box-shadow: 0 15px 35px -5px rgba(37, 99, 235, 0.7); }
-        }
-
-        .app-name {
-            font-size: 1.75rem;
-            font-weight: 800;
-            color: #1e293b;
-            letter-spacing: -0.5px;
-            margin: 0;
-        }
-
-        .app-desc {
-            color: #64748b;
-            font-size: 0.95rem;
-            margin-top: 0.25rem;
-        }
-
-        /* 4. INPUT FORM */
-        .input-group {
-            margin-bottom: 1.25rem;
-            position: relative;
-        }
-
-        .input-label {
-            display: block;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #475569;
-            margin-bottom: 0.5rem;
-            margin-left: 4px;
-        }
-
-        .modern-input {
-            width: 100%;
-            padding: 0.6rem 1rem 0.7rem 2.8rem;
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 1rem;
-            color: #334155;
-            transition: all 0.3s ease;
-        }
-
-        .input-icon {
-            position: absolute;
-            left: 18px;
-            top: 42px; /* Sesuaikan dengan posisi label */
-            color: #94a3b8;
-            transition: color 0.3s;
-        }
-
-        .modern-input:focus {
-            background: #ffffff;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-            outline: none;
-        }
+<div class="min-h-screen w-full grid grid-cols-1 lg:grid-cols-12 bg-white selection:bg-emerald-500 selection:text-white">
+    
+    {{-- ======================================================== --}}
+    {{-- PANEL KIRI: VISUAL AGRARIA & SHOWCASE PROFIL DESA       --}}
+    {{-- (Tampil 7 Kolom di Desktop, Full Banner di Layar Sedang)  --}}
+    {{-- ======================================================== --}}
+    <div class="lg:col-span-7 xl:col-span-7 relative min-h-[380px] lg:min-h-screen flex flex-col justify-between p-8 sm:p-12 lg:p-16 text-white overflow-hidden bg-slate-900">
         
-        .modern-input:focus + .input-icon { /* Ikon berubah warna saat fokus */
-            color: #3b82f6;
-        }
-
-        /* 5. TOMBOL & INTERAKSI */
-        .btn-primary {
-            width: 100%;
-            padding: 1rem;
-            background: linear-gradient(to right, #2563eb, #1d4ed8);
-            color: white;
-            font-weight: 600;
-            font-size: 1rem;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.4);
-        }
-
-        .btn-primary:active { transform: scale(0.98); }
-
-        /* Tombol Sekunder (Publik) */
-        .btn-secondary {
-            width: 100%;
-            padding: 0.9rem;
-            background: rgba(255, 255, 255, 0.5);
-            border: 2px solid #e2e8f0;
-            color: #475569;
-            font-weight: 600;
-            border-radius: 12px;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.3s;
-            margin-top: 1rem;
-        }
-
-        .btn-secondary:hover {
-            background: #ffffff;
-            border-color: #cbd5e1;
-            color: #1e293b;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-
-        /* 6. UTILITAS */
-        .divider {
-            display: flex;
-            align-items: center;
-            text-align: center;
-            margin: 1.5rem 0;
-            color: #94a3b8;
-            font-size: 0.85rem;
-        }
-        .divider::before, .divider::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        .divider::before { margin-right: 1em; }
-        .divider::after { margin-left: 1em; }
-
-        .alert-error {
-            background: #fee2e2;
-            color: #b91c1c;
-            padding: 0.75rem;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            margin-bottom: 1.5rem;
-            border: 1px solid #fecaca;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
-        }
-
-        @keyframes shake {
-            10%, 90% { transform: translate3d(-1px, 0, 0); }
-            20%, 80% { transform: translate3d(2px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-            40%, 60% { transform: translate3d(4px, 0, 0); }
-        }
-
-        .footer-copy {
-            text-align: center;
-            margin-top: 2rem;
-            font-size: 0.8rem;
-            color: #94a3b8;
-        }
-    </style>
-
-    <div class="glass-card">
-        
-        {{-- HEADER --}}
-        <div class="brand-section">
-            <div class="logo-icon">
-                <i class="fas fa-landmark"></i>
-            </div>
-            <h1 class="app-name">SITANAS</h1>
-            <p class="app-desc">Sistem Informasi Tanah kas Desa</p>
+        {{-- Background Image Tanah / Lanskap Persawahan Desa Berkualitas Tinggi --}}
+        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 scale-105"
+             style="background-image: url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1932&auto=format&fit=crop');">
         </div>
 
-        {{-- ALERT ERROR --}}
-        @if (session('error'))
-            <div class="alert-error">
-                <i class="fas fa-exclamation-circle"></i>
-                {{ session('error') }}
-            </div>
-        @endif
+        {{-- Overlay Gradien Deep Emerald Green Multi-layer --}}
+        <div class="absolute inset-0 bg-gradient-to-t from-emerald-950 via-emerald-900/85 to-emerald-950/75"></div>
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-amber-500/15 via-transparent to-transparent"></div>
 
-        {{-- FORM LOGIN --}}
-        <form wire:submit="login">
-            
-            {{-- Email Input --}}
-            <div class="input-group">
-                <label class="input-label">Email</label>
-                <i class="fas fa-envelope input-icon"></i> <input type="email" wire:model="email" class="modern-input" placeholder="admin@desa.id" required autofocus>
-                @error('email') <span style="color: #ef4444; font-size: 0.8rem; margin-top: 4px; display: block;">{{ $message }}</span> @enderror
+        {{-- Konten Atas: Identitas Kalurahan --}}
+        <div class="relative z-10">
+            <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold tracking-wide shadow-sm">
+                <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                <span>Pemerintah Kalurahan {{ $desa->nama_desa ?? 'Ngestiharjo' }} • {{ $desa->kabupaten ?? 'Kab. Bantul' }}</span>
             </div>
+        </div>
 
-            {{-- Password Input --}}
-            <div class="input-group">
-                <label class="input-label">Kata Sandi</label>
-                <i class="fas fa-lock input-icon"></i> <input type="password" wire:model="password" class="modern-input" placeholder="••••••••" required>
-                @error('password') <span style="color: #ef4444; font-size: 0.8rem; margin-top: 4px; display: block;">{{ $message }}</span> @enderror
+        {{-- Konten Tengah: Headline & Value Proposition --}}
+        <div class="relative z-10 my-auto py-8">
+            <div class="inline-flex items-center gap-2 text-emerald-300 font-semibold text-xs sm:text-sm uppercase tracking-wider mb-3">
+                <i class="fas fa-shield-halved text-amber-400"></i>
+                <span>Sistem Informasi Tanah Kas Desa</span>
             </div>
 
-            {{-- Tombol Login --}}
-            <button type="submit" class="btn-primary" wire:loading.attr="disabled">
-                <span wire:loading.remove>Masuk Aplikasi</span>
-                <span wire:loading>
-                    <i class="fas fa-circle-notch fa-spin"></i> Memproses...
-                </span>
-            </button>
+            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight text-white max-w-xl">
+                Digitalisasi Tata Kelola & Kepastian Hukum Aset Desa
+            </h1>
 
-        </form>
+            <p class="mt-4 text-emerald-100/85 text-sm sm:text-base leading-relaxed max-w-lg">
+                Mendukung transparansi pencatatan KIB A, aspek legalitas sertifikasi, pencegahan konflik lahan, hingga validasi berjenjang oleh Kepala Desa secara akuntabel.
+            </p>
 
-        <div class="divider">Atau akses sebagai tamu</div>
+            {{-- 3 Kartu Keunggulan / Fitur Terintegrasi --}}
+            <div class="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl">
+                <div class="bg-white/10 backdrop-blur-md rounded-xl p-3.5 border border-white/15">
+                    <div class="text-amber-400 text-lg mb-1.5">
+                        <i class="fas fa-book-bookmark"></i>
+                    </div>
+                    <div class="text-xs font-bold text-white">Standar KIB A</div>
+                    <div class="text-[11px] text-emerald-200/80 mt-0.5">Sesuai format resmi inventaris desa</div>
+                </div>
 
-        <a href="{{ route('publik') }}" wire:navigate class="btn-secondary">
-            <i class="fas fa-globe-asia"></i> Lihat Data Publik
-        </a>
+                <div class="bg-white/10 backdrop-blur-md rounded-xl p-3.5 border border-white/15">
+                    <div class="text-emerald-300 text-lg mb-1.5">
+                        <i class="fas fa-certificate"></i>
+                    </div>
+                    <div class="text-xs font-bold text-white">Tertib Legalitas</div>
+                    <div class="text-[11px] text-emerald-200/80 mt-0.5">Pantau sertifikat & patok batas</div>
+                </div>
 
-        <div class="footer-copy">
-            &copy; {{ date('Y') }} SITANAS by Kelompok Biru<br>All Rights Reserved.
+                <div class="bg-white/10 backdrop-blur-md rounded-xl p-3.5 border border-white/15">
+                    <div class="text-teal-300 text-lg mb-1.5">
+                        <i class="fas fa-signature"></i>
+                    </div>
+                    <div class="text-xs font-bold text-white">Validasi Kades</div>
+                    <div class="text-[11px] text-emerald-200/80 mt-0.5">Audit trail & persetujuan berjenjang</div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Konten Bawah: Footer Panel Visual --}}
+        <div class="relative z-10 pt-4 border-t border-white/15 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs text-emerald-200/70">
+            <span class="flex items-center gap-1.5">
+                <i class="fas fa-server text-emerald-400"></i>
+                <span>Database Terenkripsi & Pencadangan Otomatis</span>
+            </span>
+            <span class="font-mono text-[11px]">SITANAS v2.0 • Tim Biru</span>
         </div>
 
     </div>
+
+    {{-- ======================================================== --}}
+    {{-- PANEL KANAN: FORMULIR LOGIN APARATUR DESA                --}}
+    {{-- (5 Kolom di Desktop, Nyaman, Bersih, Ergonomis)          --}}
+    {{-- ======================================================== --}}
+    <div class="lg:col-span-5 xl:col-span-5 bg-slate-50/60 flex flex-col justify-between p-6 sm:p-10 lg:p-12 xl:p-14 border-l border-slate-200/70">
+        
+        {{-- Bar Navigasi Mini di Kanan Atas --}}
+        <div class="flex justify-between items-center mb-8">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-600 to-emerald-800 flex items-center justify-center text-white shadow-sm shadow-emerald-700/20">
+                    <i class="fas fa-landmark text-sm"></i>
+                </div>
+                <div>
+                    <span class="font-extrabold text-base text-slate-900 tracking-tight">SITANAS</span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 ml-1">Desa</span>
+                </div>
+            </div>
+
+            <a href="{{ route('publik') }}" 
+               wire:navigate 
+               class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/80 px-3 py-1.5 rounded-xl transition">
+                <i class="fas fa-globe text-[11px]"></i>
+                <span>Data Publik</span>
+            </a>
+        </div>
+
+        {{-- Area Formulir Tengah --}}
+        <div class="my-auto max-w-sm w-full mx-auto">
+            
+            {{-- Header Form --}}
+            <div class="mb-7">
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                    Masuk Akun
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-500 mt-1.5 leading-relaxed">
+                    Silakan masukkan email dan kata sandi aparatur desa Anda untuk mengelola inventaris.
+                </p>
+            </div>
+
+            {{-- Alert Error --}}
+            @if (session('error'))
+                <div class="mb-5 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs sm:text-sm flex items-start gap-2.5 shadow-xs animate-in fade-in">
+                    <i class="fas fa-circle-exclamation text-rose-500 mt-0.5 flex-shrink-0"></i>
+                    <div class="flex-1 font-medium leading-normal">
+                        {{ session('error') }}
+                    </div>
+                </div>
+            @endif
+
+            {{-- Form Login --}}
+            <form wire:submit="login" class="space-y-4">
+                
+                {{-- Field Email --}}
+                <div>
+                    <label for="email" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                        Alamat Email
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                            <i class="fas fa-envelope text-sm"></i>
+                        </div>
+                        <input type="email" 
+                               id="email" 
+                               wire:model="email" 
+                               class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 text-sm placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 transition shadow-2xs"
+                               placeholder="nama@desa.id" 
+                               required 
+                               autofocus>
+                    </div>
+                    @error('email') 
+                        <p class="mt-1 text-xs text-rose-600 flex items-center gap-1">
+                            <i class="fas fa-circle-xmark"></i> {{ $message }}
+                        </p> 
+                    @enderror
+                </div>
+
+                {{-- Field Password --}}
+                <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label for="password" class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                            Kata Sandi
+                        </label>
+                    </div>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                            <i class="fas fa-lock text-sm"></i>
+                        </div>
+                        <input type="password" 
+                               id="password" 
+                               wire:model="password" 
+                               class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 text-sm placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 transition shadow-2xs"
+                               placeholder="••••••••" 
+                               required>
+                    </div>
+                    @error('password') 
+                        <p class="mt-1 text-xs text-rose-600 flex items-center gap-1">
+                            <i class="fas fa-circle-xmark"></i> {{ $message }}
+                        </p> 
+                    @enderror
+                </div>
+
+                {{-- Tombol Masuk --}}
+                <div class="pt-2">
+                    <button type="submit" 
+                            class="w-full py-3 px-4 rounded-xl text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 shadow-md shadow-emerald-700/20 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2 transition-all duration-150 flex items-center justify-center gap-2 group cursor-pointer disabled:opacity-70"
+                            wire:loading.attr="disabled">
+                        <span wire:loading.remove class="flex items-center gap-2">
+                            <span>Masuk Aplikasi</span>
+                            <i class="fas fa-arrow-right text-xs group-hover:translate-x-0.5 transition-transform"></i>
+                        </span>
+                        <span wire:loading class="flex items-center gap-2">
+                            <i class="fas fa-circle-notch fa-spin"></i>
+                            <span>Memverifikasi Akun...</span>
+                        </span>
+                    </button>
+                </div>
+
+            </form>
+
+            {{-- Bantuan Akses Operator --}}
+            <div class="mt-6 p-3 rounded-xl bg-slate-100/80 border border-slate-200/70 text-[11px] text-slate-600 flex items-start gap-2.5">
+                <i class="fas fa-info-circle text-emerald-600 mt-0.5 flex-shrink-0 text-xs"></i>
+                <div class="leading-relaxed">
+                    Belum memiliki akun aparatur? Hubungi <strong>Admin Kalurahan</strong> untuk penambahan akun operator atau verifikator.
+                </div>
+            </div>
+
+        </div>
+
+        {{-- Footer Sisi Kanan --}}
+        <div class="mt-8 pt-4 border-t border-slate-200/60 text-center text-xs text-slate-400">
+            <p>&copy; {{ date('Y') }} SITANAS • Standar SPBE & Tata Kelola Pertanahan</p>
+        </div>
+
+    </div>
+
 </div>
